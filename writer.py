@@ -13,9 +13,10 @@ class Writer(wx.Frame):
             size=(800, 600))
         self.sourcedir = 'data/rawtranscripts'
 
-        self.doc_list = self.set_doc_list(number_sources=2, ngram_size=3)
+        self.doc_list = self.set_doc_list(number_sources=3, ngram_size=3)
 
         self.log = Log(self)
+        self.log.AppendText('i ')
 
         # TODO: this must change to receive the processed ngram data about the corpus
         #self.channel_list = [(doc, Corpus(doc.name, doc.text)) for doc in self.doc_list]
@@ -42,16 +43,18 @@ class Writer(wx.Frame):
         # add a new channel for each document in the list
         for doc in self.doc_list:
             score = str(doc.term_count('each'))
-            newchannel = Channel(self, doc)
+            newchannel = Channel(self, doc, self.log)
             gs.Add(newchannel, flag = wx.EXPAND)
 
 
         doc_grid.Add(self.log, flag=wx.EXPAND|wx.TOP|wx.BOTTOM, border=4)
         doc_grid.Add(gs, proportion=1,flag=wx.EXPAND)
 
+        """
         testing = wx.GridSizer(4, 1, 3, 3)
         testing.Add(wx.Button(self, label = 'test'))
         doc_grid.Add(testing, proportion=1,flag=wx.EXPAND)
+        """
 
         self.SetSizer(doc_grid)
 

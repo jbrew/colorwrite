@@ -6,7 +6,7 @@ import operator
 from collections import Counter
 
 class Document(object):
-	def __init__(self, name, text, max_ngram_size):
+	def __init__(self, name, text, max_ngram_size=2):
 		self.name = name
 		self.text = text
 		self.max_ngram_size = max_ngram_size

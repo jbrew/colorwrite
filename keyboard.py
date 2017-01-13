@@ -1,13 +1,14 @@
 import wx
 
 class Keyboard(wx.Panel):
-	def __init__(self, parent, title, options):
+	def __init__(self, parent, title, options, log):
 		wx.Panel.__init__(self, parent, size=wx.Size(200,-1))
 		keyboardSizer = wx.BoxSizer(wx.VERTICAL)
 		self.SetSizer(keyboardSizer)
 
-		self.log = parent.log
+		self.log = log
 		self.channel = parent
+		self.options = options
 
 		header = wx.StaticText(parent, label = title.upper(), size=wx.Size(200,40), style=wx.ALIGN_CENTRE)
 		header.SetBackgroundColour((0,0,255))
@@ -16,33 +17,43 @@ class Keyboard(wx.Panel):
 
 		for i in range(len(options)):
 			row = wx.BoxSizer(wx.HORIZONTAL)
-			text = str(options[i])
+			word = str(options[i])
 			number_label = wx.StaticText(self, label=str(i+1))
-			word_label = wx.StaticText(self, label=text, style=wx.ALIGN_LEFT)
+			word_label = wx.StaticText(self, label=word, style=wx.ALIGN_LEFT)
 
-			#word_button.text = text
-			#word_button.Bind(wx.EVT_BUTTON, lambda event: self.OnWordButton(event, self.log))
-
-			self.log.Bind(wx.EVT_CHAR_HOOK, lambda event: self.OnAddWordFromSuggestions(event, text, options))
+			self.log.Unbind(wx.EVT_CHAR_HOOK)
+			self.log.Bind(wx.EVT_CHAR_HOOK, lambda event: self.onKey(event))
 
 			row.Add(number_label)
 			row.Add(word_label)
 			keyboardSizer.Add(row)
-		self.Layout()
 
 
-		parentsizer = wx.BoxSizer(wx.VERTICAL)
-		parent.SetSizer(parentsizer)
-		parentsizer.Add(self)
-
-	def OnAddWordFromSuggestions(self, event, word, suggestions):
+	def onKey(self, event):
 		keycode = event.GetKeyCode()
-		if chr(keycode).isdigit():
+		shiftdown = event.ShiftDown()
+		print keycode
+		if keycode == wx.WXK_LEFT:
+			self.log.wordLeft()
+			self.channel.refresh()
+		elif keycode == 316:
+			self.log.wordRight()
+			self.channel.refresh()
+		elif keycode > 255:
+			event.DoAllowNextEvent()
+		elif keycode == wx.WXK_TAB:
+			self.cycle()
+		elif keycode == wx.WXK_RETURN: # enter key
+			self.channel.refresh()
+		elif keycode == 8: # delete key
+			self.log.deleteWord()
+			self.channel.refresh()
+		elif chr(keycode).isdigit():
 			index = int(chr(keycode))
-		word = suggestions[index-1]
-		self.log.AppendText(word + " ")
-		self.channel.refresh()
-
-	def OnWordButton(self, event, log):
-		text = event.GetEventObject().text
-		log.AppendText(text + " ")
+			word = self.options[index-1]
+			self.log.addWord(word)
+			self.channel.refresh()
+		else:
+			event.DoAllowNextEvent()
+		
+		

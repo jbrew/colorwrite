@@ -5,39 +5,31 @@ from inspector import Inspector
 
 class Channel(wx.Panel):
 
-	def __init__(self, parent, doc):
+	def __init__(self, parent, doc, log):
 		wx.Panel.__init__(self, parent)
-		channelSizer = wx.BoxSizer(wx.VERTICAL)
+		self.sizer = wx.BoxSizer(wx.VERTICAL)
+		self.SetSizer(self.sizer)
 		self.doc = doc
 		self.corpus = Corpus(doc)
-		suggestions = self.corpus.suggest('we', 10)
-		self.log = parent.log
-
+		self.log = log
+		
+		context = self.log.GetValue().split()[-2:]
+		suggestions = self.corpus.suggest(context, 10)
 		options = [word for (word, value) in suggestions]
-		self.keyboard = Keyboard(self, self.doc.name, options)
-		channelSizer.Add(self.keyboard)
-
-	def OnAddWordFromSuggestions(self, event, word, suggestions):
-		keycode = event.GetKeyCode()
-		if chr(keycode).isdigit():
-			index = int(chr(keycode))
-		word = suggestions[index]
-		self.log.AppendText(word + " ")
-		self.refresh()
+		self.keyboard = Keyboard(self, self.doc.name, options, self.log)
+		self.inspector = Inspector(self, doc)
+		self.sizer.Add(self.keyboard)
+		self.sizer.Add(self.inspector)
+		
 
 	def refresh(self):
-		context = self.log.GetValue().split()[-1]
+		context = self.log.before().split()[-2:]
 		suggestions = self.corpus.suggest(context, 10)
 		options = [word for (word, value) in suggestions]
 		self.keyboard.Hide()
+		self.keyboard = Keyboard(self, self.doc.name, options, self.log)
+		self.sizer.Prepend(self.keyboard)
 		self.Layout()
-		self.keyboard = Keyboard(self, self.doc.name, options)
-		self.Layout()
-		
-
-	def OnWordButton(self, event, log):
-		text = event.GetEventObject().text
-		log.AppendText(text + " ")
 
 
 	
