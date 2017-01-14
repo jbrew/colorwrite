@@ -18,9 +18,15 @@ class Corpus(object):
 		#self.build(document.text)
 		self.name = document.name
 		self.text = document.text
-		
 
 
+		"""
+		for word, ngram in self.tree.items()[1:100]:
+			print ngram.string
+			for word, count in ngram.after[0].iteritems():
+				print "\t%s" % (word + " :" + str(count))
+				self.wordcount = self.get_wordcount()
+		"""
 				
 	"""
 	takes an ngram frequency file formatted like so:
@@ -60,7 +66,7 @@ class Corpus(object):
 						try:
 							word = after[reach-1]
 							#print 'after "%s" is "%s" with reach %s' % (ngram, word, reach)
-							self.tree[ngram].add_after(word, reach, 1)
+							self.tree[ngram].add_after(word, reach, max_reach)
 						except IndexError:
 							pass
 
@@ -81,7 +87,7 @@ class Corpus(object):
 		if head in tree:
 			tree[head].count += count
 		else:
-			tree[head] = Ngram(ngram, count, 2)
+			tree[head] = Ngram(head, count, 2)
 			
 		self.wordcount += count * len(components)
 		
@@ -96,7 +102,7 @@ class Corpus(object):
 			if head in tree:
 				tree[head].count += count
 			else:
-				tree[head] = Ngram(ngram, count, 2)
+				tree[head] = Ngram(head, count, 2)
 
 			branch = tree[head].after[0]
 			if tail in branch:
@@ -104,7 +110,7 @@ class Corpus(object):
 			else:
 				branch[tail] = count
 
-
+	
 	def suggest(self, preceding, max_suggestions=20):
 		suggestions = {}
 
@@ -126,6 +132,8 @@ class Corpus(object):
 
 	def merge_dictionaries(self, dict_list):
 		return sum((Counter(dict(x)) for x in dict_list), Counter())
+
+
 
 
 

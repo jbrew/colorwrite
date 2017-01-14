@@ -7,14 +7,14 @@ class Inspector(wx.Panel):
 		contents = wx.StaticText(self, label = '')
 		searchbox = wx.TextCtrl(self)
 		searchbox.Bind(wx.EVT_CHAR_HOOK, lambda event: self.OnSearchEntry(event, searchbox, doc, contents))
-		searchbutton = wx.Button(self, label = 'search')
-		searchbutton.Bind(wx.EVT_BUTTON, lambda event: self.OnSearchButton(event, searchbox, doc, contents))
+		#searchbutton = wx.Button(self, label = 'search')
+		#searchbutton.Bind(wx.EVT_BUTTON, lambda event: self.OnSearchButton(event, searchbox, doc, contents))
 
 		inspectorSizer = wx.BoxSizer(wx.VERTICAL)
 		self.SetSizer(inspectorSizer)
-		inspectorSizer.Add(contents, proportion=1, flag=wx.EXPAND)
 		inspectorSizer.Add(searchbox, flag =wx.CENTER)
-		inspectorSizer.Add(searchbutton, flag=wx.CENTER)
+		inspectorSizer.Add(contents, proportion=1, flag=wx.EXPAND)
+		#inspectorSizer.Add(searchbutton, flag=wx.CENTER)
 
 
 	def OnSearchEntry(self, event, searchbox, doc, contents):

@@ -8,12 +8,13 @@ class Keyboard(wx.Panel):
 
 		self.log = log
 		self.channel = parent
+		self.writer = parent.writer
 		self.options = options
 
-		header = wx.StaticText(parent, label = title.upper(), size=wx.Size(200,40), style=wx.ALIGN_CENTRE)
-		header.SetBackgroundColour((0,0,255))
-		header.SetForegroundColour((255,255,255))
-		keyboardSizer.Add(header)
+		self.header = wx.StaticText(parent, label = title.upper(), size=wx.Size(200,40), style=wx.ALIGN_CENTRE)
+		self.header.SetBackgroundColour((0,0,0))
+		self.header.SetForegroundColour((255,255,255))
+		keyboardSizer.Add(self.header)
 
 		for i in range(len(options)):
 			row = wx.BoxSizer(wx.HORIZONTAL)
@@ -31,7 +32,7 @@ class Keyboard(wx.Panel):
 
 	def onKey(self, event):
 		keycode = event.GetKeyCode()
-		shiftdown = event.ShiftDown()
+		shift_down = event.ShiftDown()
 		print keycode
 		if keycode == wx.WXK_LEFT:
 			self.log.wordLeft()
@@ -42,7 +43,10 @@ class Keyboard(wx.Panel):
 		elif keycode > 255:
 			event.DoAllowNextEvent()
 		elif keycode == wx.WXK_TAB:
-			self.cycle()
+			if shift_down:
+				self.writer.cycle_backward()
+			else:
+				self.writer.cycle_forward()
 		elif keycode == wx.WXK_RETURN: # enter key
 			self.channel.refresh()
 		elif keycode == 8: # delete key

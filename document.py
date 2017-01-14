@@ -52,6 +52,12 @@ class Document(object):
 		num_words = len(term.split())
 		return self.NGRAM_COUNTS[num_words-1][term] / self.TOTALS[num_words-1]
 
+	# compute sigscore given a baseline frequency
+	def sigscore(self, term, baseline):
+		frequency = self.tf(term)
+		expected_frequency = baseline
+		return frequency / expected_frequency
+
 
 	"""
 	given a list of words preceding the insertion point and a list of words following it,

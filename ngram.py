@@ -27,7 +27,7 @@ class Ngram(object):
 	
 	
 	def __str__(self):
-		return self.string+"\ncount: "+str(self.count)
+		return "%s (%s)" % (self.string, str(self.count))
 
 	def __repr__(self):
 		return self.string
