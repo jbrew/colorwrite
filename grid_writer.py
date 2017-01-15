@@ -10,7 +10,7 @@ class GridWriter(wx.Panel):
     #----------------------------------------------------------------------
     def __init__(self, parent):
         """Constructor"""
-        wx.Panel.__init__(self, parent, size = (900,600))
+        wx.Panel.__init__(self, parent, size = (900,750))
 
         self.number_of_buttons = 0
         self.frame = parent
@@ -37,8 +37,8 @@ class GridWriter(wx.Panel):
         self.SetSizer(self.mainSizer)
 
         self.active_index = 0
-        self.log.AppendText('it ')
-        self.addPathAsChannel('data/rawtranscripts/ai')
+        self.addPathAsChannel('texts/theyoungpope')
+        #self.addPathAsChannel('data/rawtranscripts/ai')
         self.refresh()
         
         print self.activeChannel().doc.name

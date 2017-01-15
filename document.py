@@ -6,7 +6,7 @@ import operator
 from collections import Counter
 
 class Document(object):
-	def __init__(self, name, text, max_ngram_size=2):
+	def __init__(self, name, text, max_ngram_size=3):
 		self.name = name
 		self.text = text
 		self.max_ngram_size = max_ngram_size
@@ -57,31 +57,4 @@ class Document(object):
 		frequency = self.tf(term)
 		expected_frequency = baseline
 		return frequency / expected_frequency
-
-
-	"""
-	given a list of words preceding the insertion point and a list of words following it,
-	returns a list of top suggestions
-	"""
-	def suggest(self, preceding, following, max_suggestions = 50):
-		num_words = len(preceding.split())
-		d = self.NGRAM_COUNTS[num_words-1]
-		if preceding in d:
-			suggestion_list = list(reversed(sorted(d.values())))
-			return suggestion_list[0:max_suggestions]
-		else:
-			return []
 			
-		
-
-
-
-
-
-def best_test():
-	text = 'it was the best of times it was the worst of times'
-	d = Document('example', text, 4)
-	for nc in d.NGRAM_COUNTS:
-		print nc
-
-#best_test()

@@ -32,7 +32,7 @@ class Analyst(object):
 	given a list of words preceding the insertion point and a list of words following it,
 	returns a list of top suggestions
 	"""
-	def suggest(self, preceding, following, max_suggestions = 50):	
+	def suggest(self, preceding, max_suggestions = 50):	
 	
 		corpus = self.corpus
 		
@@ -59,7 +59,7 @@ class Analyst(object):
 		suggestion_list = list(reversed(sorted(suggestions.items(), key=operator.itemgetter(1))))
 		
 		# hash this state so next time it's encountered, no calculation needed
-		context = (''.join(preceding), ''.join(following))
+		context = (''.join(preceding))
 		self.memory[context] = suggestion_list
 			
 		return suggestion_list[0:max_suggestions]

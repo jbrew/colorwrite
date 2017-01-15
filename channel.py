@@ -1,5 +1,6 @@
 import wx
-from corpus import Corpus
+from corpus_new import Corpus
+from analyst import Analyst
 from keyboard import Keyboard
 from inspector import Inspector
 
@@ -11,7 +12,8 @@ class Channel(wx.Panel):
 		self.sizer = wx.BoxSizer(wx.VERTICAL)
 		self.SetSizer(self.sizer)
 		self.doc = doc
-		self.corpus = Corpus(doc)
+		#self.corpus = Corpus(doc)
+		self.corpus = Corpus([doc])
 		self.log = log
 		self.active = False
 		
@@ -27,7 +29,7 @@ class Channel(wx.Panel):
 
 	def refresh(self):
 		context = self.log.before().split()[-2:]
-		suggestions = self.corpus.suggest(context, 10)
+		suggestions = self.corpus.suggest(context, 20)
 		options = [word for (word, value) in suggestions]
 		self.keyboard.Hide()
 		self.keyboard = Keyboard(self, self.doc.name, options, self.log)
