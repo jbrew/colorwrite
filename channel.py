@@ -1,8 +1,9 @@
 import wx
-from corpus_new import Corpus
+from corpus import Corpus
 from analyst import Analyst
 from keyboard import Keyboard
 from inspector import Inspector
+import random
 
 class Channel(wx.Panel):
 
@@ -19,20 +20,29 @@ class Channel(wx.Panel):
 		
 		context = self.log.GetValue().split()[-2:]
 		suggestions = self.corpus.suggest(context, 10)
-		options = [word for (word, value) in suggestions]
-		self.keyboard = Keyboard(self, self.doc.name, options, self.log)
+		self.keyboard = Keyboard(self, self.doc.name, suggestions, self.log)
 		self.inspector = Inspector(self, doc)
 		self.sizer.Add(self.keyboard)
 		self.sizer.Add(wx.StaticLine(self, -1, wx.Point(10, 30), wx.Size(200, 30)))
 		self.sizer.Add(self.inspector)
 		
 
+	def weighted_choice(self, choices):
+		total = sum(w for (c, w) in choices)
+		r = random.uniform(0, total)
+		upto = 0
+		for c, w in choices:
+			if upto + w >= r:
+				return c
+			upto += w
+		assert False, "Shouldn't get here"
+
 	def refresh(self):
 		context = self.log.before().split()[-2:]
 		suggestions = self.corpus.suggest(context, 20)
-		options = [word for (word, value) in suggestions]
+		#print self.weighted_choice(suggestions)
 		self.keyboard.Hide()
-		self.keyboard = Keyboard(self, self.doc.name, options, self.log)
+		self.keyboard = Keyboard(self, self.doc.name, suggestions, self.log)
 		self.sizer.Prepend(self.keyboard)
 		if self.active:
 			self.keyboard.header.SetBackgroundColour((0,255,0))

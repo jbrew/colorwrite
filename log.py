@@ -3,7 +3,7 @@ import wx
 class Log(wx.TextCtrl):
 
     def __init__(self, parent):
-        wx.TextCtrl.__init__(self, parent, style=wx.TE_MULTILINE, size = (800,200))
+        wx.TextCtrl.__init__(self, parent, style=wx.TE_MULTILINE, size = (500,500))
         self.writer = parent
         self.font = wx.Font(16, wx.MODERN, wx.NORMAL, wx.NORMAL)
         self.SetFont(self.font)
@@ -23,8 +23,6 @@ class Log(wx.TextCtrl):
         insertion = self.GetInsertionPoint()
         lastword = self.before().split()[-1]
         self.SetInsertionPoint(insertion-len(lastword)-1)
-        if self.after()[0] == ' ':
-            self.SetInsertionPoint(insertion-len(lastword))
 
     # moves the cursor one word to the right
     def wordRight(self):

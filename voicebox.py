@@ -5,44 +5,51 @@ from log import Log
 import threading
  
 ########################################################################
-class GridWriter(wx.Panel):
+class Voicebox(wx.Panel):
     """"""
  
     #----------------------------------------------------------------------
     def __init__(self, parent):
         """Constructor"""
-        wx.Panel.__init__(self, parent, size = (900,750))
+        wx.Panel.__init__(self, parent, size = (1050,600))
 
         self.number_of_buttons = 0
         self.frame = parent
         self.channels = []
         self.log = Log(self)
  
-        self.mainSizer = wx.BoxSizer(wx.VERTICAL)
+        self.mainSizer = wx.BoxSizer(wx.HORIZONTAL)
+
+        self.inputSizer = wx.BoxSizer(wx.VERTICAL)
+        self.outputSizer = wx.BoxSizer(wx.VERTICAL)
         
-        controlSizer = wx.BoxSizer(wx.HORIZONTAL)
-        self.widgetSizer = wx.GridSizer(1,4,3,3)
+        self.controlSizer = wx.BoxSizer(wx.HORIZONTAL)
+        self.sourceSizer = wx.GridSizer(1,1,3,3)
 
         self.loadButton = wx.Button(self, label="Load Corpus")
         self.loadButton.Bind(wx.EVT_BUTTON, self.onLoadChannel)
-        controlSizer.Add(self.loadButton, 0, wx.CENTER|wx.LEFT, 15)
+        self.controlSizer.Add(self.loadButton, 0, wx.CENTER|wx.LEFT, 15)
 
-        logsizer = wx.BoxSizer(wx.HORIZONTAL) 
-        logsizer.Add(self.log, 0, wx.CENTER|wx.ALL, 30)
+        self.logSizer = wx.BoxSizer(wx.VERTICAL) 
+        self.logSizer.Add(self.log, 0, wx.CENTER|wx.ALL, 30)
 
+        self.inputSizer.Add(self.controlSizer, 0, wx.ALIGN_LEFT)
+        self.inputSizer.Add(self.sourceSizer, 0, wx.CENTER|wx.ALL, 10)
+        self.outputSizer.Add(self.logSizer, 0, wx.ALIGN_CENTER)
 
-        self.mainSizer.Add(logsizer, 0, wx.ALIGN_CENTER)
-        self.mainSizer.Add(controlSizer, 0, wx.ALIGN_LEFT)
-        self.mainSizer.Add(self.widgetSizer, 0, wx.CENTER|wx.ALL, 10)
+        self.mainSizer.Add(self.inputSizer)
+        self.mainSizer.Add(self.outputSizer)
+        
+        
  
         self.SetSizer(self.mainSizer)
 
         self.active_index = 0
         #self.addPathAsChannel('texts/theyoungpope')
-        self.addPathAsChannel('data/rawtranscripts/ai')
-        self.refresh()
+        #self.addPathAsChannel('data/rawtranscripts/ai')
+        #self.addPathAsChannel('data/tfidf/buddhism_3grams_tfidf')
+        #self.refresh()
         
-        print self.activeChannel().doc.name
 
 
     def activeChannel(self):
@@ -83,7 +90,7 @@ class GridWriter(wx.Panel):
     def addChannel(self, document):
         c = Channel(self, document, self.log)
         self.channels.append(c)
-        self.widgetSizer.Add(c, 0, wx.ALL, 5)
+        self.sourceSizer.Add(c, 0, wx.ALL, 5)
         self.frame.fSizer.Layout()
         self.frame.Fit()        
 
@@ -103,6 +110,8 @@ class GridWriter(wx.Panel):
         for path in paths:
             self.addPathAsChannel(path)
         self.setActive(len(self.channels)-1)
+        self.frame.fSizer.Layout()
+        self.frame.Fit()
 
         loadChannelDialog.Destroy()
 
@@ -120,10 +129,11 @@ class MyFrame(wx.Frame):
         menubar.Append(fileMenu, '&File')
         self.SetMenuBar(menubar)
         self.fSizer = wx.BoxSizer(wx.VERTICAL)
-        panel = GridWriter(self)
+        panel = Voicebox(self)
         self.fSizer.Add(panel, 1, wx.EXPAND)
         self.SetSizer(self.fSizer)
         self.Fit()
+        self.Center()
         self.Show()
  
 #----------------------------------------------------------------------

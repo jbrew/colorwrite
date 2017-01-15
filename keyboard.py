@@ -1,7 +1,7 @@
 import wx
 
 class Keyboard(wx.Panel):
-	def __init__(self, parent, title, options, log):
+	def __init__(self, parent, title, suggestions, log):
 		wx.Panel.__init__(self, parent, size=wx.Size(300,-1))
 		keyboardSizer = wx.BoxSizer(wx.VERTICAL)
 		self.SetSizer(keyboardSizer)
@@ -9,38 +9,43 @@ class Keyboard(wx.Panel):
 		self.log = log
 		self.channel = parent
 		self.writer = parent.writer
-		self.options = options
+		self.suggestions = suggestions
+		self.options = [word for (word, value) in suggestions]
 		self.font = wx.Font(16, wx.MODERN, wx.NORMAL, wx.NORMAL)
 		self.SetFont(self.font)
 
-		self.header = wx.StaticText(parent, label = title.upper(), size=wx.Size(300,40), style=wx.ALIGN_CENTRE)
+		self.header = wx.StaticText(parent, label = title.upper(), size=wx.Size(200,40), style=wx.ALIGN_CENTRE)
 		self.header.SetBackgroundColour((0,0,0))
 		self.header.SetForegroundColour((255,255,255))
 		keyboardSizer.Add(self.header)
 
 		columnSizer1 = wx.BoxSizer(wx.VERTICAL)
-		columnSizer2 = wx.BoxSizer(wx.VERTICAL)
+		#columnSizer2 = wx.BoxSizer(wx.VERTICAL)
 		keyPanelSizer = wx.BoxSizer(wx.HORIZONTAL)
 
-		for i in range(len(options)):
+		for i in range(len(self.options)):
 			row = wx.BoxSizer(wx.HORIZONTAL)
-			word = str(options[i])
+			word = str(self.options[i])
 			number_label = wx.StaticText(self, label=str(i+1))
-			word_label = wx.StaticText(self, label=word, style=wx.ALIGN_LEFT, size= wx.Size(140,-1))
+			word_label = wx.StaticText(self, label=word, style=wx.ALIGN_LEFT, size= wx.Size(200,-1))
 
 			self.log.Unbind(wx.EVT_CHAR_HOOK)
 			self.log.Bind(wx.EVT_CHAR_HOOK, lambda event: self.onKey(event))
 
 			row.Add(number_label)
 			row.Add(word_label)
+			columnSizer1.Add(row)
+			"""
 			if i < 10:
 				columnSizer1.Add(row)
 			else:
 				columnSizer2.Add(row)
-
+			"""
 		keyPanelSizer.Add(columnSizer1)
-		keyPanelSizer.Add(columnSizer2)
+		#keyPanelSizer.Add(columnSizer2)
 		keyboardSizer.Add(keyPanelSizer)
+		columnSizer1.Layout()
+
 
 
 	def onKey(self, event):
@@ -76,10 +81,11 @@ class Keyboard(wx.Panel):
 			index = int(chr(keycode))
 			if shift_down:
 				index += 10
-			word = self.options[index-1]
+			#word = str(self.suggestions[index-1])
+			word = str(self.options[index-1])
 			self.log.addWord(word)
 			self.channel.refresh()
 		else:
 			event.DoAllowNextEvent()
-		
+
 		

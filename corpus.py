@@ -4,134 +4,77 @@ import operator
 import string
 import re
 import math
+from collections import Counter
+
 
 class Corpus(object):
-	def __init__(self, name, text):
-		self.name = name
-		self.text = text
-		self.wordcount = 0
-		self.max_reach = 2
+	"""
+	Takes a list of documents, each of which has a list of dictionaries of ngram counts by size called NGRAM_COUNTS
+	"""
+
+	def __init__(self, documents = []):		
 		self.tree = {}
-		self.build(text)
-		
-		#self.ccae_weight = .0001
-		#self.eat_ccae_filtered('ngram_data/w2_.txt',set(self.tree.keys()))
-		#self.eat_ccae_filtered('ngram_data/w3_.txt', set(self.tree.keys()))
-		#self.eat_ccae_filtered('ngram_data/w4_.txt', set(self.tree.keys()))
-		
-		self.wordcount = self.get_wordcount()
-		self.baseline_weight = .0001
-		self.baseline = self.get_baseline()
-		self.memory = {}
-	
-	"""
-	baseline computation step: assign words a small score just for occurring in the dictionary
-	"""
-	def get_baseline(self):
-		baseline = {}
-		for key in self.tree:
-			if len(key.split())==1:
-				baseline[key] = self.baseline_weight * self.tree[key].count
-		return baseline
-		
-	def get_wordcount(self):
-		wordcount = 0
-		for key in self.tree:
-			if len(key.split())==1:
-				wordcount += 1
-		return wordcount
-	
-	# returns overall frequency of word w in the corpus
-	def overall_frequency(self, w):
-		if w in self.tree:
-			return self.tree[w].count / self.wordcount
-		else:
-			return 0
+		self.wordcount = 0
+		self.documents = {}
+		self.max_ngram_size = 0
+		for doc in documents:
+			self.add_document(doc)
+		#for key, ngram in self.tree.items():
+			#print key, ngram.after[0]
 
-	# given a context, looks forward r words from that ngram and returns the frequency of word w
-	def conditional_frequency(self, preceding, r, w):
-		entry = self.tree[preceding]
-		if w in entry.after[r-1]:
-			return entry.after[r-1][w] / entry.count
-		else:
-			return 0
-	
-	# given a context, looks forward n words from that ngram and returns the significance score of word w	
-	def sigscore(self, preceding, r, w):
-		try:
-			return self.conditional_frequency(preceding, r, w) / self.overall_frequency(w)
-		except ZeroDivisionError:
-			return 0
 
-	# increments the score in a dictionary
-	def tallyscore(self, ngram, score, tree):
+	def add_document(self, doc):
+		self.max_ngram_size = max(doc.max_ngram_size-1, self.max_ngram_size)
+		self.documents[doc.name] = doc
+		for COUNT_DICT in doc.NGRAM_COUNTS:
+			for ngram, count in COUNT_DICT.iteritems():
+				self.add_sequence(ngram, count, self.tree)
+
+	def add_sequence(self, sequence, count, tree):
+		tokens = sequence.split(' ')
+		#print '\nsequence', tokens
+		sequence_length = len(tokens)
+
+		if sequence_length == 1:
+			word = sequence
+			self.increment_tree(word, count, tree, self.max_ngram_size)
+			self.wordcount += 1
+		
+		elif sequence_length > 1:
+			for reach in [1,2]:
+				endpoint = len(tokens)-reach
+				context = " ".join(tokens[:endpoint])
+				word = tokens[-1]
+				#print "context", context
+				if len(context) > 0:
+					self.increment_tree(context, count, tree, self.max_ngram_size)
+					branch = tree[context].after[reach-1]
+					self.increment_branch(word, count, branch)
+			
+			
+			
+			"""
+			if ngram_size > 1:
+				head = " ".join(tokens[:-2])
+				self.increment_tree(head, count, tree, self.max_ngram_size)
+
+				branch = tree[head].after[ngram_size-1]
+				self.increment_branch(tail, count, branch)
+			"""
+
+	def increment_tree(self, ngram, count, tree, max_ngram_size):
 		if ngram in tree:
-			tree[ngram] += score
+			tree[ngram].count += count
 		else:
-			tree[ngram] = score
+			tree[ngram] = Ngram(ngram, count, max_ngram_size)
 
-	
-	"""
-	takes a natural language source text
-	"""
-	def build(self, source_text):
-		source_text = source_text.lower().replace('\xe2\x80\x99',"'") 	# last call gets rid of slanted apostrophe
-		sentences = source_text.split('. ')
-		
-		for s in sentences:
-			s = s.strip('\n') \
-                        .translate(string.maketrans('', ''), string.punctuation.replace('\'', '')) \
-                        .lower()
-			self.eat_token_string(s.split())
-		return
-	
-	"""
-	s is a string of tokens
-	reach is the number of tokens to look back and forward
-	max_ngram_size is the largest chunks stored
-	"""
 
-	def eat_token_string(self, s, max_reach=2, max_ngram_size=3):
-		for ngram_size in range(1, max_ngram_size+1):
-			for i in range(len(s)):
-				start = i
-				end = i + ngram_size
-				if start >= 0 and end < len(s)+1:
-					before, current, after = s[:start],s[start:end],s[end:]
-					
-					if len(current) == 1:
-						self.wordcount += 1
-					
-					ngram = " ".join(current)
-					
-					if ngram in self.tree:
-						self.tree[ngram].count += 1
-					else:
-						self.tree[ngram] = Ngram(ngram, 1, max_reach)
-					
-					for reach in range(1,max_reach + 1):
-					
-						# update dictionary to reflect all words occurring after this ngram
-						try:
-							word = after[reach-1]
-							#print 'after "%s" is "%s" with reach %s' % (ngram, word, reach)
-							self.tree[ngram].add_after(word, reach, 1)
-						except IndexError:
-							pass
-						
-						"""
-						# update dictionary to reflect all words occurring before this ngram
-						try:
-							word = before[-1*(reach)]
-							self.tree[ngram].add_before(word, reach, 1)
-						except IndexError:
-							pass
-						"""
+	def increment_branch(self, ngram, count, branch):
+		if ngram in branch:
+			branch[ngram] += count
+		else:
+			branch[ngram] = count
 
-	""""
-	ALTERNATE ENTRY METHODS
-	"""
-		
 	"""
 	takes an ngram frequency file formatted like so:
 	
@@ -144,49 +87,88 @@ class Corpus(object):
 		for line in source_text:
 			sequence, count = line.split('\t')
 			self.enter_sequence(sequence, int(count), self.tree)
-		
-	"""
-	takes an ngram frequency file from the Corpus of Contemporary American English, formatted like so:
-	
-	count	word1	word2	word3 ...
-	"""
-	def eat_ccae(self, path):
-		database = file(path).readlines()
-		for line in database:
-			splitline = line.split()
-			count = float(splitline[0])
-			sequence = " ".join(splitline[1:])
-			score = count * self.ccae_weight
-			self.enter_sequence(sequence, float(score), self.tree)
-	
-	# only process data that is in the wordset
-	def eat_ccae_filtered(self, path, whitelist):
-		database = file(path).readlines()
-		for line in database:
-			splitline = line.split()
-			count = float(splitline[0])
-			sequence_set = set(splitline[1:])
-			
-			if sequence_set < whitelist:
-				sequence = " ".join(splitline[1:])
-				score = count * self.ccae_weight
-				self.enter_sequence(sequence, float(score), self.tree)
 
-	# enters this ngram in the tree
-	def enter_sequence(self, ngram, count, tree):
-		components = ngram.split(' ')
-		head = " ".join(components[:-1])
-		tail = components[-1]
-		
-		if head in tree:
-			tree[head].count += count
-		else:
-			tree[head] = Ngram(ngram, count, 1)
-			
-		self.wordcount += count * len(components)
-		
-		branch = tree[head].after[0]
-		if tail in branch:
-			branch[tail] += count
-		else:
-			branch[tail] = count
+	"""
+	takes a document with a list of dictionaries of ngram counts, split up by size
+	"""
+	def eat_document(self, document):
+		for ngram_count_dict in document.NGRAM_COUNTS:
+				for sequence, count in ngram_count_dict.iteritems():
+					self.enter_sequence(sequence, count, self.tree)
+
+	
+	def suggest(self, preceding, max_suggestions=20):
+		suggestions = {}
+
+		for key, ngram in self.tree.iteritems():
+			if len(key.split()) == 1:
+				suggestions[key] = ngram.count * .0000000000000001
+
+		for reach in range(1, self.max_ngram_size+1):
+
+			if reach == 1:
+				sequence_list = [preceding[i:] for i in range(len(preceding))]
+			else:
+				sequence_list = [preceding[i:reach*-1+1] for i in range(len(preceding)-1)]
+
+			#print "sequence list", sequence_list
+			#print "reach", reach
+			#print self.tree
+
+			for sequence in sequence_list:
+				ngram_size = len(sequence)
+				ngram = " ".join(sequence)
+				weight = (1 * math.pow(ngram_size, 100)) / math.pow(reach, 10)
+				#print "\n", sequence
+				#print "size", ngram_size
+				#print "reach", reach
+				#print "weight:",weight
+
+				if ngram in self.tree:
+					component = self.tree[ngram].after[reach-1]
+					new_component = self.weight_dictionary(component, weight)
+					suggestions = self.merge_dictionaries([suggestions, new_component])
+
+		suggestion_list = list(reversed(sorted(suggestions.items(), key=operator.itemgetter(1))))
+		return suggestion_list[0:max_suggestions]
+
+
+	def merge_dictionaries(self, dict_list):
+		return sum((Counter(dict(x)) for x in dict_list), Counter())
+
+	def weight_dictionary(self, dict, weight):
+		new_dict = {}
+		for word, score in dict.items():
+			newscore = float(score) * weight
+			new_dict[word] = newscore
+		return new_dict
+
+
+from document import Document
+
+def best_test():
+	d = Document('test', 'it was the best of times', 4)
+	c = Corpus()
+	c.add_document(d)
+	print c.suggest(['it'])
+	print '\n'
+	print c.suggest(['it', 'was'])
+	print '\n'
+	print c.suggest(['it','was','the'])
+	print '\n'
+	print c.max_ngram_size
+
+def ai_test():
+	path = 'data/rawtranscripts/ai'
+	with open(path) as f:
+		text = f.read()[0:8000]
+	d = Document('ai', text, 4)
+	c = Corpus()
+	c.add_document(d)
+	print c.suggest(['it'])
+	print c.suggest(['we','cannot','see'])
+
+
+#ai_test()
+
+
