@@ -46,15 +46,18 @@ class Channel(wx.Panel):
 		#print self.weighted_choice(suggestions)
 		self.keyboard.Hide()
 		self.keyboard = Keyboard(self, self.doc.name, suggestions, self.log)
-		self.sizer.Prepend(self.keyboard)
 		if self.active:
+			self.keyboard.SetForegroundColour(self.color)
 			self.keyboard.header.SetBackgroundColour(self.color)
 			if sum(self.color) > 500:
 				self.keyboard.header.SetForegroundColour("Black")
 			else:
 				self.keyboard.header.SetForegroundColour("White")
+			self.keyboard.Layout()
 		else:
+			#self.keyboard.SetForegroundColour((80,80,80))
 			self.keyboard.header.SetBackgroundColour((0,0,0))
+		self.sizer.Prepend(self.keyboard)
 		self.Layout()
 
 

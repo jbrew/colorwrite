@@ -18,9 +18,13 @@ class Keyboard(wx.Panel):
 		headerfont = wx.Font(18, wx.DEFAULT, wx.NORMAL, wx.NORMAL)
 		self.header.SetFont(headerfont)
 		self.SetBackgroundColour((60,60,60))
-		self.SetForegroundColour(self.channel.color)
-
-		self.header.SetForegroundColour(self.channel.color)
+		if self.channel.active:
+			self.SetForegroundColour((self.channel.color))
+			self.header.SetForegroundColour(self.channel.color)
+		else:
+			self.SetForegroundColour(tuple([x/4 for x in(self.channel.color)]))
+			self.header.SetForegroundColour(tuple([x/4 for x in(self.channel.color)]))
+		
 		keyboardSizer.Add(self.header)
 
 		columnSizer1 = wx.BoxSizer(wx.VERTICAL)
