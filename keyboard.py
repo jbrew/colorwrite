@@ -77,7 +77,12 @@ class Keyboard(wx.Panel):
 			else:
 				self.writer.cycle_forward()
 		elif keycode == wx.WXK_RETURN: # enter key
-			self.writer.refresh()
+			if shift_down:
+				toAdd = "\n\n%s:" % self.channel.doc.name.upper()
+				self.log.addWord(toAdd, self.channel.color)
+			else:
+				self.writer.refresh()
+
 		elif keycode == 8: # delete key
 			self.log.deleteWord()
 			self.channel.refresh()
