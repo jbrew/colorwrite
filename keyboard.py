@@ -2,7 +2,7 @@ import wx
 
 class Keyboard(wx.Panel):
 	def __init__(self, parent, title, suggestions, log):
-		wx.Panel.__init__(self, parent, size=wx.Size(300,-1))
+		wx.Panel.__init__(self, parent, size=wx.Size(200,-1))
 		keyboardSizer = wx.BoxSizer(wx.VERTICAL)
 		self.SetSizer(keyboardSizer)
 
@@ -15,6 +15,9 @@ class Keyboard(wx.Panel):
 		self.SetFont(self.font)
 
 		self.header = wx.StaticText(parent, label = title.upper(), size=wx.Size(200,40), style=wx.ALIGN_CENTRE)
+		headerfont = wx.Font(18, wx.DEFAULT, wx.NORMAL, wx.NORMAL)
+		self.header.SetFont(headerfont)
+		self.SetBackgroundColour((255,255,255))
 		self.header.SetBackgroundColour((0,0,0))
 		self.header.SetForegroundColour((255,255,255))
 		keyboardSizer.Add(self.header)
@@ -26,7 +29,7 @@ class Keyboard(wx.Panel):
 		for i in range(len(self.options)):
 			row = wx.BoxSizer(wx.HORIZONTAL)
 			word = str(self.options[i])
-			number_label = wx.StaticText(self, label=str(i+1))
+			number_label = wx.StaticText(self, label=str((i+1) % 10))
 			word_label = wx.StaticText(self, label=word, style=wx.ALIGN_LEFT, size= wx.Size(200,-1))
 
 			self.log.Unbind(wx.EVT_CHAR_HOOK)
@@ -73,7 +76,7 @@ class Keyboard(wx.Panel):
 			else:
 				self.writer.cycle_forward()
 		elif keycode == wx.WXK_RETURN: # enter key
-			self.channel.refresh()
+			self.writer.refresh()
 		elif keycode == 8: # delete key
 			self.log.deleteWord()
 			self.channel.refresh()

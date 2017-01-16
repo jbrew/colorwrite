@@ -19,12 +19,10 @@ class Corpus(object):
 		self.max_ngram_size = 0
 		for doc in documents:
 			self.add_document(doc)
-		#for key, ngram in self.tree.items():
-			#print key, ngram.after[0]
 
 
 	def add_document(self, doc):
-		self.max_ngram_size = max(doc.max_ngram_size-1, self.max_ngram_size)
+		self.max_ngram_size = max(doc.max_ngram_size, self.max_ngram_size)
 		self.documents[doc.name] = doc
 		for COUNT_DICT in doc.NGRAM_COUNTS:
 			for ngram, count in COUNT_DICT.iteritems():
@@ -41,7 +39,7 @@ class Corpus(object):
 			self.wordcount += 1
 		
 		elif sequence_length > 1:
-			for reach in [1,2]:
+			for reach in range(1, self.max_ngram_size):
 				endpoint = len(tokens)-reach
 				context = " ".join(tokens[:endpoint])
 				word = tokens[-1]
@@ -96,10 +94,18 @@ class Corpus(object):
 				for sequence, count in ngram_count_dict.iteritems():
 					self.enter_sequence(sequence, count, self.tree)
 
+
+	def suggest_multiple(self, preceding, num_words, max_suggestions=20):
+		
+		for ngram_dict in self.doc.NGRAM_COUNTS:
+			pass
+
+
 	
 	def suggest(self, preceding, max_suggestions=20):
 		suggestions = {}
 
+		# construct the baseline dictionary
 		for key, ngram in self.tree.iteritems():
 			if len(key.split()) == 1:
 				suggestions[key] = ngram.count * .0000000000000001
@@ -118,7 +124,7 @@ class Corpus(object):
 			for sequence in sequence_list:
 				ngram_size = len(sequence)
 				ngram = " ".join(sequence)
-				weight = (1 * math.pow(ngram_size, 100)) / math.pow(reach, 10)
+				weight = (1 * math.pow(ngram_size, 10)) / math.pow(reach, 10)
 				#print "\n", sequence
 				#print "size", ngram_size
 				#print "reach", reach

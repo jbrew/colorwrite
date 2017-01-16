@@ -6,13 +6,11 @@ import operator
 from collections import Counter
 
 class Document(object):
-	def __init__(self, name, text, max_ngram_size=6):
+	def __init__(self, name, text, max_ngram_size=4):
 		self.name = name
 		self.text = text
 		self.max_ngram_size = max_ngram_size
 		self.NGRAM_COUNTS = self.ngram_counts(text)
-		for n in self.NGRAM_COUNTS:
-			print len(n)
 		self.TOTALS = self.totals(self.NGRAM_COUNTS)
 	
 	def term_count(self, term):

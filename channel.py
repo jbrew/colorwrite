@@ -8,7 +8,7 @@ import random
 class Channel(wx.Panel):
 
 	def __init__(self, parent, doc, log):
-		wx.Panel.__init__(self, parent)
+		wx.Panel.__init__(self, parent, style=wx.SUNKEN_BORDER)
 		self.writer = parent
 		self.sizer = wx.BoxSizer(wx.VERTICAL)
 		self.SetSizer(self.sizer)
@@ -21,10 +21,12 @@ class Channel(wx.Panel):
 		context = self.log.GetValue().split()[-2:]
 		suggestions = self.corpus.suggest(context, 10)
 		self.keyboard = Keyboard(self, self.doc.name, suggestions, self.log)
-		self.inspector = Inspector(self, doc)
+		
 		self.sizer.Add(self.keyboard)
-		self.sizer.Add(wx.StaticLine(self, -1, wx.Point(10, 30), wx.Size(200, 30)))
-		self.sizer.Add(self.inspector)
+		#self.sizer.Add(wx.StaticLine(self, -1, wx.Point(10, 30), wx.Size(200, 30)))
+		#self.inspector = Inspector(self, doc)
+		#self.inspector.SetBackgroundColour((150,150,150))
+		#self.sizer.Add(self.inspector)
 		
 
 	def weighted_choice(self, choices):
@@ -39,7 +41,7 @@ class Channel(wx.Panel):
 
 	def refresh(self):
 		context = self.log.before().split()[-2:]
-		suggestions = self.corpus.suggest(context, 20)
+		suggestions = self.corpus.suggest(context, 10)
 		#print self.weighted_choice(suggestions)
 		self.keyboard.Hide()
 		self.keyboard = Keyboard(self, self.doc.name, suggestions, self.log)

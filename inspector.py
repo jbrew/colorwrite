@@ -13,7 +13,7 @@ class Inspector(wx.Panel):
 		inspectorSizer = wx.BoxSizer(wx.VERTICAL)
 		self.SetSizer(inspectorSizer)
 		inspectorSizer.Add(searchbox, flag =wx.CENTER)
-		inspectorSizer.Add(contents, proportion=1, flag=wx.EXPAND)
+		inspectorSizer.Add(contents, proportion=1)
 		#inspectorSizer.Add(searchbutton, flag=wx.CENTER)
 
 

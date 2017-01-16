@@ -15,6 +15,8 @@ class Voicebox(wx.Panel):
 
         self.number_of_buttons = 0
         self.frame = parent
+        self.SetBackgroundColour((50,50,50))
+        self.SetForegroundColour((255,255,255))
         self.channels = []
         self.log = Log(self)
  
@@ -24,21 +26,21 @@ class Voicebox(wx.Panel):
         self.outputSizer = wx.BoxSizer(wx.VERTICAL)
         
         self.controlSizer = wx.BoxSizer(wx.HORIZONTAL)
-        self.sourceSizer = wx.GridSizer(1,1,3,3)
+        self.sourceSizer = wx.GridSizer(0,2,3,3)
 
-        self.loadButton = wx.Button(self, label="Load Corpus")
+        self.loadButton = wx.Button(self, label="Load another text")
         self.loadButton.Bind(wx.EVT_BUTTON, self.onLoadChannel)
-        self.controlSizer.Add(self.loadButton, 0, wx.CENTER|wx.LEFT, 15)
+        self.controlSizer.Add(self.loadButton, 0, wx.CENTER|wx.ALL, 15)
 
         self.logSizer = wx.BoxSizer(wx.VERTICAL) 
         self.logSizer.Add(self.log, 0, wx.CENTER|wx.ALL, 30)
 
-        self.inputSizer.Add(self.controlSizer, 0, wx.ALIGN_LEFT)
+        self.inputSizer.Add(self.controlSizer, 0, wx.ALIGN_CENTER)
         self.inputSizer.Add(self.sourceSizer, 0, wx.CENTER|wx.ALL, 10)
         self.outputSizer.Add(self.logSizer, 0, wx.ALIGN_CENTER)
 
-        self.mainSizer.Add(self.inputSizer)
         self.mainSizer.Add(self.outputSizer)
+        self.mainSizer.Add(self.inputSizer)
         
         
  
@@ -47,8 +49,9 @@ class Voicebox(wx.Panel):
         self.active_index = 0
         #self.addPathAsChannel('texts/theyoungpope')
         #self.addPathAsChannel('data/rawtranscripts/ai')
-        #self.addPathAsChannel('data/tfidf/buddhism_3grams_tfidf')
-        #self.refresh()
+        self.addPathAsChannel('texts/bowie')
+        #self.addPathAsChannel('data/counts/overall')
+        
         
 
 
@@ -85,6 +88,9 @@ class Voicebox(wx.Panel):
 
         d = Document(name, text)
         self.addChannel(d)
+        self.setActive(len(self.channels)-1)
+        self.frame.fSizer.Layout()
+        self.frame.Fit()
 
     #----------------------------------------------------------------------
     def addChannel(self, document):
@@ -102,16 +108,14 @@ class Voicebox(wx.Panel):
 
     def onLoadChannel(self,event):
         #loadChannelDialog = wx.FileDialog(self, style = wx.FD_MULTIPLE, defaultDir='/Users/jamiebrew/Desktop/github/librarian/data/tfidf/')
-        loadChannelDialog = wx.FileDialog(self, style = wx.FD_MULTIPLE, defaultDir='data/rawtranscripts/')
+        loadChannelDialog = wx.FileDialog(self, style = wx.FD_MULTIPLE, defaultDir='texts/')
 
         loadChannelDialog.ShowModal()
 
         paths = loadChannelDialog.GetPaths()
         for path in paths:
             self.addPathAsChannel(path)
-        self.setActive(len(self.channels)-1)
-        self.frame.fSizer.Layout()
-        self.frame.Fit()
+        
 
         loadChannelDialog.Destroy()
 
