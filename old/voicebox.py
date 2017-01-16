@@ -39,6 +39,7 @@ class Voicebox(wx.Panel):
         self.inputSizer.Add(self.sourceSizer, 0, wx.CENTER|wx.ALL, 10)
         self.outputSizer.Add(self.logSizer, 0, wx.ALIGN_CENTER)
 
+
         self.mainSizer.Add(self.outputSizer)
         self.mainSizer.Add(self.inputSizer)
         

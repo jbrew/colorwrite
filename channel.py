@@ -7,9 +7,10 @@ import random
 
 class Channel(wx.Panel):
 
-	def __init__(self, parent, doc, log):
+	def __init__(self, parent, doc, log, color):
 		wx.Panel.__init__(self, parent, style=wx.SUNKEN_BORDER)
 		self.writer = parent
+		self.color = color
 		self.sizer = wx.BoxSizer(wx.VERTICAL)
 		self.SetSizer(self.sizer)
 		self.doc = doc
@@ -21,7 +22,7 @@ class Channel(wx.Panel):
 		context = self.log.GetValue().split()[-2:]
 		suggestions = self.corpus.suggest(context, 10)
 		self.keyboard = Keyboard(self, self.doc.name, suggestions, self.log)
-		
+
 		self.sizer.Add(self.keyboard)
 		#self.sizer.Add(wx.StaticLine(self, -1, wx.Point(10, 30), wx.Size(200, 30)))
 		#self.inspector = Inspector(self, doc)
@@ -47,7 +48,11 @@ class Channel(wx.Panel):
 		self.keyboard = Keyboard(self, self.doc.name, suggestions, self.log)
 		self.sizer.Prepend(self.keyboard)
 		if self.active:
-			self.keyboard.header.SetBackgroundColour((0,255,0))
+			self.keyboard.header.SetBackgroundColour(self.color)
+			if sum(self.color) > 500:
+				self.keyboard.header.SetForegroundColour("Black")
+			else:
+				self.keyboard.header.SetForegroundColour("White")
 		else:
 			self.keyboard.header.SetBackgroundColour((0,0,0))
 		self.Layout()

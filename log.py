@@ -3,9 +3,11 @@ import wx
 class Log(wx.TextCtrl):
 
     def __init__(self, parent):
-        wx.TextCtrl.__init__(self, parent, style=wx.TE_MULTILINE, size = (500,500))
+        wx.TextCtrl.__init__(self, parent, style=wx.TE_MULTILINE|wx.TE_RICH2, size = (500,500))
         self.writer = parent
         self.font = wx.Font(16, wx.MODERN, wx.NORMAL, wx.NORMAL)
+        self.bgcolor = (60,60,60)
+        self.SetBackgroundColour(self.bgcolor)
         self.SetFont(self.font)
 
     def after(self):
@@ -30,22 +32,29 @@ class Log(wx.TextCtrl):
         nextword = self.after().split()[0]
         self.SetInsertionPoint(insertion+len(nextword)+1)
 
-    def addWord(self, word):
+    def addWord(self, word, color):
+        self.SetDefaultStyle(wx.TextAttr(color, self.bgcolor))
+
+        self.WriteText(" " + word)
+        """
         if len(self.before()) > 0 and self.before()[-1] == ' ':
             addition = word
         else:
             addition = " " + word
+
         new_before = self.before() + addition
         self.SetValue(new_before + self.after())
         self.SetInsertionPoint(len(new_before))
+        current = self.GetInsertionPoint()
+        print current
+        """
+        
 
     # deletes one word
     def deleteWord(self):
-        after = self.after()
-        self.wordLeft()
+        word = self.before().split()[-1]
         insertion = self.GetInsertionPoint()
-        self.SetValue(self.before() + after)
-        self.SetInsertionPoint(insertion)
+        self.Remove(insertion-(len(word)+1), insertion)
 
     def fontPlus(self):
         size = self.font.GetPointSize()
