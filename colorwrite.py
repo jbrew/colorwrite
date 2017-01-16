@@ -30,7 +30,7 @@ class ColorWrite(wx.Panel):
         self.controlSizer = wx.BoxSizer(wx.HORIZONTAL)
         self.sourceSizer = wx.GridSizer(0,2,3,3)
 
-        self.loadButton = wx.Button(self, label="Load another text")
+        self.loadButton = wx.Button(self, label="Load another source")
         self.loadButton.Bind(wx.EVT_BUTTON, self.onLoadChannel)
         self.controlSizer.Add(self.loadButton, 0, wx.CENTER|wx.ALL, 15)
 
@@ -133,7 +133,7 @@ class MyFrame(wx.Frame):
     #----------------------------------------------------------------------
     def __init__(self):
         """Constructor"""
-        wx.Frame.__init__(self, parent=None, title="Color Write")
+        wx.Frame.__init__(self, parent=None, title="ColorWrite")
         menubar = wx.MenuBar()
         fileMenu = wx.Menu()
         menubar.Append(fileMenu, '&File')
