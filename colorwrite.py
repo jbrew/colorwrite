@@ -2,7 +2,10 @@ import wx
 from document import Document
 from channel import Channel
 from log import Log
+from sourceboard import SourceBoard
+from entrypad import EntryPad
 import threading
+
  
 ########################################################################
 class ColorWrite(wx.Panel):
@@ -13,50 +16,61 @@ class ColorWrite(wx.Panel):
         """Constructor"""
         wx.Panel.__init__(self, parent, size = (1050,600))
 
-        self.number_of_buttons = 0
         self.frame = parent
         self.SetBackgroundColour((50,50,50))
         self.SetForegroundColour((255,255,255))
         self.channels = []
-        self.log = Log(self)
+        
         self.colors = [(255,0,0),(0,255,0),(100,100,255),
                         (255,255,0),(0,255,255),(255,0,255)]
  
         self.mainSizer = wx.BoxSizer(wx.HORIZONTAL)
-
-        self.inputSizer = wx.BoxSizer(wx.VERTICAL)
-        self.outputSizer = wx.BoxSizer(wx.VERTICAL)
+        self.SetSizer(self.mainSizer)
         
-        self.controlSizer = wx.BoxSizer(wx.HORIZONTAL)
-        self.sourceSizer = wx.GridSizer(0,2,3,3)
+        self.outputPanel = wx.Panel(self)
+        self.outputSizer = wx.BoxSizer(wx.VERTICAL)
+        self.outputPanel.SetSizer(self.outputSizer)
+        self.log = Log(self.outputPanel, self)            # text control for text output
+        #self.ep = EntryPad(self.outputPanel,['one','two','three'],self.log)
 
-        self.loadButton = wx.Button(self, label="Load another source")
+        #self.outputHeader = wx.Panel(self.outputPanel)
+        #headerSizer = wx.BoxSizer(wx.HORIZONTAL)
+        #self.outputHeader.SetSizer(headerSizer)
+        #headerSizer.AddSpacer((230,0))
+        #l = wx.StaticText(self.outputPanel, wx.CENTER, label="Output")
+        #l.SetForegroundColour("White")
+        #headerSizer.Add(l)
+        #self.outputSizer.Add(self.outputHeader)
+        self.outputSizer.AddSpacer((0,50))
+        self.outputSizer.Add(self.log)
+        #self.outputSizer.Add(self.ep)
+
+        self.inputPanel = wx.Panel(self)
+        self.inputSizer = wx.BoxSizer(wx.VERTICAL)
+        self.inputPanel.SetSizer(self.inputSizer)
+        self.sourceboard = SourceBoard(self.inputPanel, self.log)
+
+        self.controlPanel = wx.Panel(self.inputPanel)
+        self.controlSizer = wx.BoxSizer(wx.HORIZONTAL)
+        self.loadButton = wx.Button(self.controlPanel, label="Load another source")
         self.loadButton.Bind(wx.EVT_BUTTON, self.onLoadChannel)
         self.controlSizer.Add(self.loadButton, 0, wx.CENTER|wx.ALL, 15)
 
-        self.logSizer = wx.BoxSizer(wx.VERTICAL) 
-        self.logSizer.Add(self.log, 0, wx.CENTER|wx.ALL, 30)
+        self.inputSizer.Add(self.controlPanel)
+        self.inputSizer.Add(self.sourceboard)
 
-        self.inputSizer.Add(self.controlSizer, 0, wx.ALIGN_CENTER)
-        self.inputSizer.Add(self.sourceSizer, 0, wx.CENTER|wx.ALL, 10)
-        self.outputSizer.Add(self.logSizer, 0, wx.ALIGN_CENTER)
-
-
-        self.mainSizer.Add(self.outputSizer)
-        self.mainSizer.Add(self.inputSizer)
+        self.mainSizer.Add(self.inputPanel)
+        self.mainSizer.AddSpacer((10,0))
+        self.mainSizer.Add(self.outputPanel)
         
-        
- 
-        self.SetSizer(self.mainSizer)
 
         self.active_index = 0
-        #self.addPathAsChannel('texts/theyoungpope')
-        #self.addPathAsChannel('data/rawtranscripts/ai')
-        self.addPathAsChannel('texts/bowie')
-        self.addPathAsChannel('texts/proverbs')
-        self.addPathAsChannel('texts/trump')
 
-        #self.addPathAsChannel('data/counts/overall')
+        
+        #self.addPathAsChannel('texts/pbs history')
+        #self.addPathAsChannel('texts/pbs nature')
+        #self.addPathAsChannel('texts/pbs tech')
+
         
         
 
@@ -74,18 +88,18 @@ class ColorWrite(wx.Panel):
         self.activeChannel().active = False
         self.active_index = (self.active_index + 1) % len(self.channels)
         self.activeChannel().active = True
+        self.sourceboard.ScrollChildIntoView(self.activeChannel())
         self.refresh()
 
     def cycle_backward(self):
         self.activeChannel().active = False
         self.active_index = (self.active_index - 1) % len(self.channels)
         self.activeChannel().active = True
+        self.sourceboard.ScrollChildIntoView(self.activeChannel())
         self.refresh()
 
     #----------------------------------------------------------------------
     def addPathAsChannel(self, path):
-        """"""
-        self.number_of_buttons += 1
 
         with open(path) as f:
             text = f.read()
@@ -100,11 +114,11 @@ class ColorWrite(wx.Panel):
 
     #----------------------------------------------------------------------
     def addChannel(self, document):
-        c = Channel(self, document, self.log, self.colors[len(self.channels)-1])
+        c = Channel(self.sourceboard, self, document, self.log, self.colors[len(self.channels)])
         self.channels.append(c)
-        self.sourceSizer.Add(c, 0, wx.ALL, 5)
-        self.frame.fSizer.Layout()
-        self.frame.Fit()        
+        self.sourceboard.addChannel(c)
+        self.sourceboard.Layout()
+        self.sourceboard.Fit()        
 
     def setActive(self, new_index):
         self.activeChannel().active = False
@@ -114,7 +128,7 @@ class ColorWrite(wx.Panel):
 
     def onLoadChannel(self,event):
         #loadChannelDialog = wx.FileDialog(self, style = wx.FD_MULTIPLE, defaultDir='/Users/jamiebrew/Desktop/github/librarian/data/tfidf/')
-        loadChannelDialog = wx.FileDialog(self, style = wx.FD_MULTIPLE, defaultDir='texts/')
+        loadChannelDialog = wx.FileDialog(self, style = wx.FD_MULTIPLE, defaultDir='~/Desktop/github/dredger/texts')
 
         loadChannelDialog.ShowModal()
 

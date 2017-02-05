@@ -64,11 +64,16 @@ class Librarian(object):
 
 
 	def investigate(self, word, doc):
-		print('\n')
-		print (word)
-		print ('idf: %s' % self.idf(word))
-		print ('tf in %s: %s' % (doc.name, doc.tf(word)))
-		print ('tf idf: %s' % self.tf_idf(word, doc))
+		report = ''
+		report +='\n'
+		report += ('\n' + word)
+		idf_msg = '\nidf: %s' % self.idf(word)
+		report += idf_msg
+		tf_msg = '\ntf in %s: %s' % (doc.name, doc.tf(word))
+		report += tf_msg
+		tfidf_msg = '\ntf idf: %s' % self.tf_idf(word, doc)
+		report += tfidf_msg
+		return report
 	
 
 

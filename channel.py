@@ -7,9 +7,9 @@ import random
 
 class Channel(wx.Panel):
 
-	def __init__(self, parent, doc, log, color):
+	def __init__(self, parent, writer, doc, log, color=(0,0,0)):
 		wx.Panel.__init__(self, parent, style=wx.SUNKEN_BORDER)
-		self.writer = parent
+		self.writer = writer
 		self.color = color
 		self.sizer = wx.BoxSizer(wx.VERTICAL)
 		self.SetSizer(self.sizer)
@@ -20,7 +20,7 @@ class Channel(wx.Panel):
 		self.active = False
 		
 		context = self.log.GetValue().split()[-2:]
-		suggestions = self.corpus.suggest(context, 10)
+		suggestions = self.corpus.suggest(context, 20)
 		self.keyboard = Keyboard(self, self.doc.name, suggestions, self.log)
 
 		self.sizer.Add(self.keyboard)
@@ -42,17 +42,17 @@ class Channel(wx.Panel):
 
 	def refresh(self):
 		context = self.log.before().split()[-2:]
-		suggestions = self.corpus.suggest(context, 10)
+		suggestions = self.corpus.suggest(context, 20)
 		#print self.weighted_choice(suggestions)
 		self.keyboard.Hide()
 		self.keyboard = Keyboard(self, self.doc.name, suggestions, self.log)
 		if self.active:
 			self.keyboard.SetForegroundColour(self.color)
-			self.keyboard.header.SetBackgroundColour(self.color)
-			if sum(self.color) > 500:
-				self.keyboard.header.SetForegroundColour("Black")
-			else:
-				self.keyboard.header.SetForegroundColour("White")
+			self.keyboard.header.SetForegroundColour(self.color)
+			#if sum(self.color) > 500:
+			#	self.keyboard.header.SetForegroundColour("Black")
+			#else:
+			#	self.keyboard.header.SetForegroundColour("White")
 			self.keyboard.Layout()
 		else:
 			#self.keyboard.SetForegroundColour((80,80,80))

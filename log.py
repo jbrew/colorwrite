@@ -2,9 +2,9 @@ import wx
 
 class Log(wx.TextCtrl):
 
-    def __init__(self, parent):
-        wx.TextCtrl.__init__(self, parent, style=wx.TE_MULTILINE|wx.TE_RICH2, size = (500,500))
-        self.writer = parent
+    def __init__(self, parent, writer):
+        wx.TextCtrl.__init__(self, parent, style=wx.TE_MULTILINE|wx.TE_RICH2, size = (700,300))
+        self.writer = writer
         self.font = wx.Font(16, wx.MODERN, wx.NORMAL, wx.NORMAL)
         self.bgcolor = (60,60,60)
         self.SetBackgroundColour(self.bgcolor)
@@ -34,6 +34,7 @@ class Log(wx.TextCtrl):
 
     def addWord(self, word, color):
         self.SetDefaultStyle(wx.TextAttr(color, self.bgcolor))
+        self.SetFont(self.font)
 
         self.WriteText(" " + word)
         """

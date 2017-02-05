@@ -18,6 +18,7 @@ class Keyboard(wx.Panel):
 		headerfont = wx.Font(18, wx.DEFAULT, wx.NORMAL, wx.NORMAL)
 		self.header.SetFont(headerfont)
 		self.SetBackgroundColour((60,60,60))
+		self.header.SetBackgroundColour("Black")
 		if self.channel.active:
 			self.SetForegroundColour((self.channel.color))
 			self.header.SetForegroundColour(self.channel.color)
