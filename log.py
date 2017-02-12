@@ -7,6 +7,7 @@ class Log(wx.TextCtrl):
         self.writer = writer
         self.font = wx.Font(16, wx.MODERN, wx.NORMAL, wx.NORMAL)
         self.bgcolor = (60,60,60)
+        self.fontcolor = "White"
         self.SetBackgroundColour(self.bgcolor)
         self.SetFont(self.font)
 
@@ -33,7 +34,8 @@ class Log(wx.TextCtrl):
         self.SetInsertionPoint(insertion+len(nextword)+1)
 
     def addWord(self, word, color):
-        self.SetDefaultStyle(wx.TextAttr(color, self.bgcolor))
+        self.fontcolor = self.writer.sourceboard.average_color()
+        self.SetDefaultStyle(wx.TextAttr(self.fontcolor))
         self.SetFont(self.font)
 
         self.WriteText(" " + word)
