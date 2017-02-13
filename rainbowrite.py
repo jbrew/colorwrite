@@ -99,7 +99,7 @@ class MyFrame(wx.Frame):
 	#----------------------------------------------------------------------
 	def __init__(self):
 		"""Constructor"""
-		wx.Frame.__init__(self, parent=None, title="Colorwrite")
+		wx.Frame.__init__(self, parent=None, title="rainbowrite")
 		menubar = wx.MenuBar()
 		fileMenu = wx.Menu()
 		menubar.Append(fileMenu, '&File')

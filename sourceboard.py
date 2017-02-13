@@ -34,6 +34,14 @@ class SourceBoard(wx.lib.scrolledpanel.ScrolledPanel):
 		for c in self.channels:
 			c.refresh()
 
+	# activates only the given channel
+	def set_solo(self, solo_channel):
+		for c in self.channels:
+			c.weight = 0
+			c.wt_slider.SetValue(0)
+		solo_channel.weight = 100
+		solo_channel.wt_slider.SetValue(100)
+
 
 	def average_color(self):
 		max_value = 100*255

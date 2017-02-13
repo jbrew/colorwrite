@@ -29,6 +29,9 @@ class Channel(wx.Panel):
 		self.wt_slider.Bind(wx.EVT_SLIDER, self.OnSliderScroll)
 		self.sizer.Add(self.wt_slider)
 
+		self.Bind(wx.EVT_LEFT_UP, self.OnClick)
+		#self.keyboard.header.Bind(wx.EVT_LEFT_UP, self.OnClick)
+
 
 		#self.sizer.Add(wx.StaticLine(self, -1, wx.Point(10, 30), wx.Size(200, 30)))
 		#self.inspector = Inspector(self, doc)
@@ -39,6 +42,12 @@ class Channel(wx.Panel):
 		obj = e.GetEventObject()
 		val = obj.GetValue()
 		self.weight = val
+		#new_color = self.writer.sourceboard.average_color()
+		#self.writer.SetBackgroundColour(new_color)
+		#self.writer.frame.Layout()
+
+	def OnClick(self, e):
+		self.writer.sourceboard.set_solo(self)
 
 	def suggest(self, number):
 		context = self.log.GetValue().split()[-2:]

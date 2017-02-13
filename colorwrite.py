@@ -17,8 +17,10 @@ class Rainbowrite(wx.Panel):
 		wx.Panel.__init__(self, parent, size = (1050,600))
 
 		self.frame = parent
-		self.SetBackgroundColour((50,50,50))
+		self.SetBackgroundColour((40,40,40))
 		self.SetForegroundColour((255,255,255))
+
+		self.color_writing = False
  
 		self.mainSizer = wx.BoxSizer(wx.HORIZONTAL)
 		self.SetSizer(self.mainSizer)
@@ -33,8 +35,6 @@ class Rainbowrite(wx.Panel):
 		self.inputPanel.SetSizer(self.inputSizer)
 		self.sourceboard = SourceBoard(self.inputPanel, self, self.log, channels=[])
 
-		self.addPathAsChannel('texts/bowie')
-
 		self.ep = EntryPad(self.outputPanel,self.sourceboard,self.log)
 		self.outputSizer.AddSpacer((0,50))
 		self.outputSizer.Add(self.log)
@@ -43,24 +43,35 @@ class Rainbowrite(wx.Panel):
 		self.refresh()
 
 		self.controlPanel = wx.Panel(self.inputPanel)
-		self.controlSizer = wx.BoxSizer(wx.HORIZONTAL)
+		self.controlSizer = wx.BoxSizer(wx.VERTICAL)
+		self.controlPanel.SetSizer(self.controlSizer)
+
 		self.loadButton = wx.Button(self.controlPanel, label="Load another source")
 		self.loadButton.Bind(wx.EVT_BUTTON, self.onLoadChannel)
 		self.controlSizer.Add(self.loadButton, 0, wx.CENTER|wx.ALL, 15)
 
+		self.colorBox = wx.CheckBox(self.controlPanel, label="Color writing")
+		self.colorBox.Bind(wx.EVT_CHECKBOX, self.onChecked)
+		self.controlPanel.SetBackgroundColour((80,80,80))
+		self.controlSizer.Add(self.colorBox, 0, wx.CENTER|wx.ALL, 15)
+
 		self.inputSizer.Add(self.controlPanel)
 		self.inputSizer.Add(self.sourceboard)
+		
 
 		self.mainSizer.Add(self.inputPanel)
 		self.mainSizer.AddSpacer((10,0))
 		self.mainSizer.Add(self.outputPanel)
 
 
+	def onChecked(self,e):
+		cb = e.GetEventObject()
+		self.color_writing = cb.GetValue()
+		print self.color_writing
 
 	#----------------------------------------------------------------------
 	def refresh(self):
 		self.sourceboard.refresh()
-		self.ep.refresh()
 		self.ep.Destroy()
 		self.ep = EntryPad(self.outputPanel,self.sourceboard,self.log)
 		self.outputSizer.Add(self.ep, wx.BOTTOM)
@@ -75,12 +86,13 @@ class Rainbowrite(wx.Panel):
 		name = path.split('/')[-1]
 		d = Document(name, text)
 		self.sourceboard.addChannel(d)
+		self.refresh()
 		self.frame.fSizer.Layout()
 		self.frame.Fit()
 
 	def onLoadChannel(self,event):
 		#loadChannelDialog = wx.FileDialog(self, style = wx.FD_MULTIPLE, defaultDir='/Users/jamiebrew/Desktop/github/librarian/data/tfidf/')
-		loadChannelDialog = wx.FileDialog(self, style = wx.FD_MULTIPLE, defaultDir='~/Desktop/github/dredger/texts')
+		loadChannelDialog = wx.FileDialog(self, style = wx.FD_MULTIPLE)
 
 		loadChannelDialog.ShowModal()
 

@@ -6,9 +6,10 @@ class Log(wx.TextCtrl):
         wx.TextCtrl.__init__(self, parent, style=wx.TE_MULTILINE|wx.TE_RICH2, size = (700,300))
         self.writer = writer
         self.font = wx.Font(16, wx.MODERN, wx.NORMAL, wx.NORMAL)
-        self.bgcolor = (60,60,60)
+        self.bgcolor = (20,20,20)
         self.fontcolor = "White"
         self.SetBackgroundColour(self.bgcolor)
+        self.SetDefaultStyle(wx.TextAttr(self.fontcolor))
         self.SetFont(self.font)
 
     def after(self):
@@ -33,8 +34,12 @@ class Log(wx.TextCtrl):
         nextword = self.after().split()[0]
         self.SetInsertionPoint(insertion+len(nextword)+1)
 
-    def addWord(self, word, color):
-        self.fontcolor = self.writer.sourceboard.average_color()
+    def addWord(self, word):
+        if self.writer.color_writing:
+            new_color = self.writer.sourceboard.average_color()
+            self.fontcolor = new_color
+        else:
+            self.fontcolor = "White"
         self.SetDefaultStyle(wx.TextAttr(self.fontcolor))
         self.SetFont(self.font)
 
