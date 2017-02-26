@@ -38,6 +38,8 @@ class Log(wx.TextCtrl):
         if self.writer.color_writing:
             new_color = self.writer.sourceboard.average_color()
             self.fontcolor = new_color
+            #self.writer.bgcolor = new_color
+            #self.writer.SetBackgroundColour(new_color)
         else:
             self.fontcolor = "White"
         self.SetDefaultStyle(wx.TextAttr(self.fontcolor))

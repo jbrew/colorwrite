@@ -7,12 +7,18 @@ from collections import Counter
 
 class Document(object):
 	def __init__(self, name, text, max_ngram_size=4):
-		self.name = name
+		self.name = self.simple_name(name)
 		self.text = text
 		self.max_ngram_size = max_ngram_size
 		self.NGRAM_COUNTS = self.ngram_counts(text)
 		self.TOTALS = self.totals(self.NGRAM_COUNTS)
 	
+	def simple_name(self, name):
+		if name.split('.')[-1] == 'txt':
+			name = '.'.join(name.split('.')[:-1])
+		return name
+
+
 	def term_count(self, term):
 		num_words = len(term.split())
 		if term in self.NGRAM_COUNTS[num_words-1]:

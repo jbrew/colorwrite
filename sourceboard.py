@@ -30,6 +30,14 @@ class SourceBoard(wx.lib.scrolledpanel.ScrolledPanel):
 		self.Layout()
 		self.SetupScrolling(scroll_x = False, scroll_y = True)
 
+	def removeChannel(self, c):
+		if c in self.channels:
+			self.channels.remove(c)
+			self.sbSizer.Remove(c)
+			c.Destroy()
+		self.sbSizer.Layout()
+		self.Layout()
+
 	def refresh(self):
 		for c in self.channels:
 			c.refresh()

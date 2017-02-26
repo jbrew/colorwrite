@@ -9,6 +9,7 @@ class Channel(wx.Panel):
 
 	def __init__(self, parent, writer, doc, log, color=(0,0,0)):
 		wx.Panel.__init__(self, parent, style=wx.SUNKEN_BORDER)
+		self.sourceboard = parent
 		self.writer = writer
 		self.color = color
 		self.sizer = wx.BoxSizer(wx.VERTICAL)
@@ -22,11 +23,14 @@ class Channel(wx.Panel):
 
 		self.keyboard = Keyboard(self, self.doc.name, self.log)
 		self.sizer.Add(self.keyboard)
-		label = wx.StaticText(self, label='Weight')
-		label.SetForegroundColour(self.color)
-		self.sizer.Add(label)
+		self.label = wx.StaticText(self, label='Weight')
+		self.label.SetForegroundColour(self.color)
+		self.sizer.Add(self.label)
 		self.wt_slider = wx.Slider(self, value=100, minValue=0, maxValue=100)
 		self.wt_slider.Bind(wx.EVT_SLIDER, self.OnSliderScroll)
+		#self.del_button = wx.Button(self, label="X")
+		#self.del_button.Bind(wx.EVT_BUTTON, self.OnDelete)
+		#self.sizer.Add(self.del_button)
 		self.sizer.Add(self.wt_slider)
 
 		self.Bind(wx.EVT_LEFT_UP, self.OnClick)
@@ -46,12 +50,17 @@ class Channel(wx.Panel):
 		#self.writer.SetBackgroundColour(new_color)
 		#self.writer.frame.Layout()
 
+	def OnDelete(self, e):
+		self.sourceboard.removeChannel(self)
+
+
 	def OnClick(self, e):
 		self.writer.sourceboard.set_solo(self)
 
 	def suggest(self, number):
-		context = self.log.GetValue().split()[-2:]
-		return self.corpus.suggest(context, number)
+		preceding = self.log.GetValue()[0:self.log.GetInsertionPoint()].split()[-2:]
+		following = self.log.GetValue()[self.log.GetInsertionPoint():].split()[:2]
+		return self.corpus.suggest(preceding, number)
 
 	def weighted_choice(self, choices):
 		total = sum(w for (c, w) in choices)

@@ -1,3 +1,4 @@
+from __future__ import division
 import wx
 from collections import Counter
 import operator
@@ -5,15 +6,18 @@ import operator
 class EntryPad(wx.Panel):
 
 	def __init__(self, parent, sourceboard, log):
-		wx.Panel.__init__(self, parent, size=wx.Size(log.GetSize()[0],-1))
+		self.width = log.GetSize()[0]
+		wx.Panel.__init__(self, parent, size=wx.Size(self.width,-1))
 		self.sourceboard = sourceboard
-		self.epSizer = wx.GridSizer(0,3,20,5)
+		self.columns = 3
+		self.rows = 0
+		self.epSizer = wx.GridSizer(self.rows,self.columns,5,5)
 		self.SetSizer(self.epSizer)
 		self.log = log
 		self.font = wx.Font(16, wx.MODERN, wx.NORMAL, wx.NORMAL)
 		self.SetFont(self.font)
 		self.fontcolor = "White"
-		self.max = 12
+		self.max = 9
 		self.options = []
 		self.refresh()
 		
@@ -21,24 +25,43 @@ class EntryPad(wx.Panel):
 	def refresh(self):
 		suggestions_list = [(c.suggest(self.max),c.weight) for c in self.sourceboard.channels]
 		suggestions = self.weighted_combine(suggestions_list)
-		self.options = suggestions[0:self.max]
+		words = [word for word, score in suggestions]
+		scores = [score for word, score in suggestions]
+		if len(scores) > 0:
+			colors = self.scores_to_colors(scores)
+		self.options = words[0:self.max]
 		self.epSizer.Clear(True)
 		for i in range(len(self.options)):
 			word = str(self.options[i])
-			button = wx.Panel(self, style = wx.RAISED_BORDER)
-			button.SetBackgroundColour(self.log.bgcolor)
+			print word, scores[i], colors[i]
+			
+			column_width = self.width/self.columns-7
 
+			b_frame = wx.Panel(self, size = wx.Size(column_width,40))
+			bf_sizer = wx.BoxSizer(wx.VERTICAL)
+			h_sizer = wx.BoxSizer(wx.HORIZONTAL)
+			button = wx.Panel(b_frame, style = wx.NO_BORDER, size = wx.Size(column_width-4,36))
+			h_sizer.Add(button, 0, wx.CENTER)
+			bf_sizer.AddStretchSpacer(1)
+			bf_sizer.Add(h_sizer,0, wx.CENTER)
+			bf_sizer.AddStretchSpacer(1)
+			b_frame.SetSizer(bf_sizer)
+
+			b_frame.SetBackgroundColour(colors[i])
+			button.SetBackgroundColour(self.log.bgcolor)
 			buttonSizer = wx.BoxSizer(wx.HORIZONTAL)
 			button.SetSizer(buttonSizer)
 			number_label = wx.StaticText(button, label=str((i+1)), size=wx.Size(30,-1))
-			word_label = wx.StaticText(button, label=word, style=wx.ALIGN_LEFT, size= wx.Size(200,-1))
+			word_label = wx.StaticText(button, label=word, style=wx.ALIGN_LEFT)
 			word_label.SetForegroundColour(self.fontcolor)
 			number_label.SetForegroundColour(self.fontcolor)
 			buttonSizer.Add(number_label)
 			buttonSizer.Add(word_label)
+			button.Layout()
+			b_frame.Layout()
 			self.log.Unbind(wx.EVT_CHAR_HOOK)
 			self.log.Bind(wx.EVT_CHAR_HOOK, lambda event: self.onKey(event))
-			self.epSizer.Add(button)
+			self.epSizer.Add(b_frame)
 			button.Bind(wx.EVT_LEFT_UP, lambda event, w = word: self.onClick(event,w))
 		self.Layout()
 
@@ -51,9 +74,19 @@ class EntryPad(wx.Panel):
 					suggestions[word] += value * weight
 				else:
 					suggestions[word] = value * weight
-		#suggestions = sum((Counter(dict(x)) for x in suggestions_list),Counter())
 		top_suggestions = list(reversed(sorted(suggestions.items(),key=operator.itemgetter(1))))
-		return [word for word, score in top_suggestions]
+		return [(word, score) for word, score in top_suggestions]
+
+	# given a list of scores, returns a list of colors in the format (R,G,B)
+	def scores_to_colors(self, scores):
+		min_score = min(scores)
+		max_score = max(scores)
+		score_range = max_score - min_score
+		difs_from_min = [score-min_score for score in scores]
+		proportional_difs = [dif/score_range for dif in difs_from_min]
+		intensities = [55+proportion*200 for proportion in proportional_difs]
+		colors = [(intensity, intensity, 0) for intensity in intensities]
+		return colors
 
 
 	def onClick(self, event, word):

@@ -38,15 +38,16 @@ class Rainbowrite(wx.Panel):
 		self.ep = EntryPad(self.outputPanel,self.sourceboard,self.log)
 		self.outputSizer.AddSpacer((0,50))
 		self.outputSizer.Add(self.log)
+		self.outputSizer.AddSpacer((0,10))
 		self.outputSizer.Add(self.ep)
 
 		self.refresh()
 
-		self.controlPanel = wx.Panel(self.inputPanel)
+		self.controlPanel = wx.Panel(self.inputPanel, size=wx.Size(205,-1))
 		self.controlSizer = wx.BoxSizer(wx.VERTICAL)
 		self.controlPanel.SetSizer(self.controlSizer)
 
-		self.loadButton = wx.Button(self.controlPanel, label="Load another source")
+		self.loadButton = wx.Button(self.controlPanel, label="Load a source")
 		self.loadButton.Bind(wx.EVT_BUTTON, self.onLoadChannel)
 		self.controlSizer.Add(self.loadButton, 0, wx.CENTER|wx.ALL, 15)
 
@@ -62,6 +63,11 @@ class Rainbowrite(wx.Panel):
 		self.mainSizer.Add(self.inputPanel)
 		self.mainSizer.AddSpacer((10,0))
 		self.mainSizer.Add(self.outputPanel)
+
+		"""
+		if len(self.sourceboard.channels) == 0:
+			self.loadDialog()
+		"""
 
 
 	def onChecked(self,e):
@@ -91,8 +97,13 @@ class Rainbowrite(wx.Panel):
 		self.frame.Fit()
 
 	def onLoadChannel(self,event):
-		#loadChannelDialog = wx.FileDialog(self, style = wx.FD_MULTIPLE, defaultDir='/Users/jamiebrew/Desktop/github/librarian/data/tfidf/')
+		self.loadDialog()
+
+
+	def loadDialog(self):
 		loadChannelDialog = wx.FileDialog(self, style = wx.FD_MULTIPLE)
+
+		loadChannelDialog.SetMessage("Select a source text.")
 
 		loadChannelDialog.ShowModal()
 
@@ -123,6 +134,8 @@ class MyFrame(wx.Frame):
 		self.Fit()
 		self.Center()
 		self.Show()
+		
+
  
 #----------------------------------------------------------------------
 if __name__ == "__main__":
