@@ -64,6 +64,8 @@ class Rainbowrite(wx.Panel):
 		self.mainSizer.AddSpacer((10,0))
 		self.mainSizer.Add(self.outputPanel)
 
+		self.addPathAsChannel('texts/bowie')
+
 		"""
 		if len(self.sourceboard.channels) == 0:
 			self.loadDialog()

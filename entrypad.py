@@ -2,6 +2,7 @@ from __future__ import division
 import wx
 from collections import Counter
 import operator
+from wordbutton import WordButton
 
 class EntryPad(wx.Panel):
 
@@ -18,6 +19,8 @@ class EntryPad(wx.Panel):
 		self.SetFont(self.font)
 		self.fontcolor = "White"
 		self.max = 9
+		self.active_row = 1
+		self.active_column = 1
 		self.options = []
 		self.refresh()
 		
@@ -33,10 +36,12 @@ class EntryPad(wx.Panel):
 		self.epSizer.Clear(True)
 		for i in range(len(self.options)):
 			word = str(self.options[i])
-			print word, scores[i], colors[i]
+			#print word, scores[i], colors[i]
 			
 			column_width = self.width/self.columns-7
 
+			button = WordButton(self, size=wx.Size(column_width,40), num=i, word=word, outercolor=colors[i], innercolor=self.log.bgcolor, fontcolor="White")
+			"""
 			b_frame = wx.Panel(self, size = wx.Size(column_width,40))
 			bf_sizer = wx.BoxSizer(wx.VERTICAL)
 			h_sizer = wx.BoxSizer(wx.HORIZONTAL)
@@ -59,11 +64,37 @@ class EntryPad(wx.Panel):
 			buttonSizer.Add(word_label)
 			button.Layout()
 			b_frame.Layout()
+			"""
 			self.log.Unbind(wx.EVT_CHAR_HOOK)
 			self.log.Bind(wx.EVT_CHAR_HOOK, lambda event: self.onKey(event))
-			self.epSizer.Add(b_frame)
+			self.epSizer.Add(button)
 			button.Bind(wx.EVT_LEFT_UP, lambda event, w = word: self.onClick(event,w))
 		self.Layout()
+
+	# returns the number of the active button
+	def active_number(self):
+		return self.active_row * self.columns + self.active_column
+
+	# moves the button selector down one spot	
+	def nav_up(self):
+		if self.active_row > 1:
+			self.active_row -= 1
+
+	# moves the button selector down one spot
+	def nav_down(self):
+		if self.active_row < self.max/self.columns:
+			self.active_row += 1
+
+	# moves the button selector left one spot
+	def nav_left(self):
+		if self.active_column > 1:
+			self.active_column -= 1
+
+	# moves the button selector right one spot
+	def nav_right(self):
+		if self.active_column < self.columns:
+			self.active_column += 1
+
 
 
 	def weighted_combine(self, suggestions_list):

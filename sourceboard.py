@@ -62,27 +62,3 @@ class SourceBoard(wx.lib.scrolledpanel.ScrolledPanel):
 			g_total += g
 			b_total += b
 		return (r_total/max_value*255, g_total/max_value*255, b_total/max_value*255)
-
-
-
-class MyFrame(wx.Frame):
-
-	def __init__(self):
-		wx.Frame.__init__(self,parent=None, title="BoardTest")
-		menubar = wx.MenuBar()
-		fileMenu = wx.Menu()
-		menubar.Append(fileMenu, '&File')
-		self.SetMenuBar(menubar)
-		self.fSizer = wx.BoxSizer(wx.VERTICAL)
-		panel = Board(self)
-		self.fSizer.Add(panel, 1, wx.EXPAND)
-		self.SetSizer(self.fSizer)
-		self.Fit()
-		self.Center()
-		self.Show()
-
-if __name__=='__main__':
-	app = wx.App()
-	frame = MyFrame()
-	frame.Show()
-	app.MainLoop()
