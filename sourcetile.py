@@ -1,6 +1,6 @@
 import wx
 
-class Keyboard(wx.Panel):
+class SourceTile(wx.Panel):
 	def __init__(self, parent, title, log):
 		wx.Panel.__init__(self, parent, size=wx.Size(-1,-1))
 		keyboardSizer = wx.BoxSizer(wx.VERTICAL)

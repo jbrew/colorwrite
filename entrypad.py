@@ -3,12 +3,14 @@ import wx
 from collections import Counter
 import operator
 from wordbutton import WordButton
+from rwsettings import RwSettings
 
 class EntryPad(wx.Panel):
 
-	def __init__(self, parent, sourceboard, log):
+	def __init__(self, parent, sourceboard, log, writer):
 		self.width = log.GetSize()[0]
 		wx.Panel.__init__(self, parent, size=wx.Size(self.width,-1))
+		self.writer = writer
 		self.sourceboard = sourceboard
 		self.columns = 3
 		self.rows = 0
@@ -19,12 +21,12 @@ class EntryPad(wx.Panel):
 		self.font = wx.Font(16, wx.MODERN, wx.NORMAL, wx.NORMAL)
 		self.SetFont(self.font)
 		self.fontcolor = "White"
-		self.max = 9
-		self.active_row = 1
-		self.active_column = 1
+		self.max = 3
+		self.active = 1
 		self.options = []
-		self.weight_highlighting = False
-		self.highlight_selection = False
+
+		self.settings = RwSettings()
+
 		self.refresh()
 		
 	# a full refresh. gets new suggestions from the corpus and then performs a superficial refresh
@@ -48,50 +50,68 @@ class EntryPad(wx.Panel):
 			word = str(self.options[i])
 			button_size = wx.Size(self.column_width,40)
 
-			if self.highlight_selection and self.active_number() == i+1:
-				outercolor = (0,255,0)
-			elif self.weight_highlighting:
+			if self.settings.highlight_selection:
+				if self.active+1 == i+1:
+					outercolor = (0,255,0)
+				else:
+					outercolor = (0,0,0)
+
+			elif self.settings.weight_highlighting:
 				outercolor=colors[i]
-			else:
-				outercolor=(0,0,0)
+			
+			elif self.settings.mouse_highlighting:
+				outercolor=(0,255,0)
 			
 			innercolor=self.log.bgcolor
 
-			button = WordButton(self, size=button_size, num=i, word=word, outercolor=outercolor, innercolor=innercolor, fontcolor="White")
+			button = WordButton(self, size=button_size, num=i, word=word, outercolor=outercolor, innercolor=innercolor, settings=self.settings,fontcolor="White")
 
-			self.log.Unbind(wx.EVT_CHAR_HOOK)
-			self.log.Bind(wx.EVT_CHAR_HOOK, lambda event: self.onKey(event))
+			self.writer.Unbind(wx.EVT_CHAR_HOOK)
+			self.writer.Bind(wx.EVT_CHAR_HOOK, lambda event: self.onKey(event))
 			self.epSizer.Add(button)
-			button.Bind(wx.EVT_LEFT_UP, lambda event, w = word: self.onClick(event,w))
+			button.inset_button.Bind(wx.EVT_LEFT_UP, lambda event, w = word: self.onClick(event,w))
 		self.Layout()
 
+	"""
 	# returns the number of the active button
-	def active_number(self):
+	def active(self):
 		return (self.active_row-1) * self.columns + self.active_column
+	"""
+	
+	# sets the given number to be active
+	def set_active(self, n):
+		self.active = n
+
+	# given an index, returns the row and column
+	def coordinates(self, i):
+		r = ((self.active) // self.columns)
+		c = self.active % self.columns
+		return r, c
 
 	# moves the button selector left one spot
 	def nav_left(self):
-		if self.active_column > 1:
-			self.active_column -= 1
+		r, c = self.coordinates(self.active)
+		c = (c - 1) % self.columns
+		self.active = r*self.columns + c
 
 	# moves the button selector right one spot
 	def nav_right(self):
-		if self.active_column < self.columns:
-			self.active_column += 1
+		r, c = self.coordinates(self.active)
+		c = (c + 1) % self.columns
+		self.active = r*self.columns + c
+
 
 	# moves the button selector down one spot	
 	def nav_up(self):
-		if self.active_row > 1:
-			self.active_row -= 1
+		self.active = ((self.active - self.columns) % self.max) 
 
 	# moves the button selector down one spot
 	def nav_down(self):
-		if self.active_row < self.max/self.columns:
-			self.active_row += 1
+		self.active = ((self.active + self.columns) % self.max)
 
 	# enters the selected word
 	def enter_selected(self):
-		self.log.addWord(self.options[self.active_number()-1])
+		self.log.addWord(self.options[self.active])
 
 
 	def weighted_combine(self, suggestions_list):
@@ -111,7 +131,7 @@ class EntryPad(wx.Panel):
 		max_score = max(scores)
 		score_range = max_score - min_score
 		difs_from_min = [score-min_score for score in scores]
-		proportional_difs = [dif/score_range for dif in difs_from_min]
+		proportional_difs = [dif/(score_range+.01) for dif in difs_from_min]
 		intensities = [55+proportion*200 for proportion in proportional_difs]
 		colors = [(intensity, intensity, 0) for intensity in intensities]
 		return colors
@@ -152,7 +172,7 @@ class EntryPad(wx.Panel):
 			self.surface_refresh()
 		elif keycode > 255:
 			event.DoAllowNextEvent()
-		elif keycode == wx.WXK_TAB:
+		elif keycode == wx.WXK_SPACE or keycode == wx.WXK_TAB:
 			self.enter_selected()
 			self.refresh()
 		elif keycode == wx.WXK_RETURN: # enter key

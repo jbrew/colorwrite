@@ -1,7 +1,6 @@
 import wx
 from corpus import Corpus
-from analyst import Analyst
-from keyboard import Keyboard
+from sourcetile import SourceTile
 from inspector import Inspector
 import random
 
@@ -20,27 +19,24 @@ class Channel(wx.Panel):
 		self.active = False
 		self.weight = 100
 		self.suggestions = self.suggest(20)
+		self.inspector = False
 
-		self.keyboard = Keyboard(self, self.doc.name, self.log)
-		self.sizer.Add(self.keyboard)
+		self.sourcetile = SourceTile(self, self.doc.name, self.log)
+		self.sizer.Add(self.sourcetile)
 		self.label = wx.StaticText(self, label='Weight')
 		self.label.SetForegroundColour(self.color)
 		self.sizer.Add(self.label)
 		self.wt_slider = wx.Slider(self, value=100, minValue=0, maxValue=100)
 		self.wt_slider.Bind(wx.EVT_SLIDER, self.OnSliderScroll)
-		#self.del_button = wx.Button(self, label="X")
-		#self.del_button.Bind(wx.EVT_BUTTON, self.OnDelete)
-		#self.sizer.Add(self.del_button)
 		self.sizer.Add(self.wt_slider)
 
-		self.Bind(wx.EVT_LEFT_UP, self.OnClick)
-		#self.keyboard.header.Bind(wx.EVT_LEFT_UP, self.OnClick)
+		#self.sourcetile.header.Bind(wx.EVT_LEFT_UP, self.OnClick)
 
-
-		#self.sizer.Add(wx.StaticLine(self, -1, wx.Point(10, 30), wx.Size(200, 30)))
-		#self.inspector = Inspector(self, doc)
-		#self.inspector.SetBackgroundColour((150,150,150))
-		#self.sizer.Add(self.inspector)
+		if self.inspector:
+			self.sizer.Add(wx.StaticLine(self, -1, wx.Point(10, 30), wx.Size(200, 30)))
+			self.inspector = Inspector(self, doc)
+			self.inspector.SetBackgroundColour((150,150,150))
+			self.sizer.Add(self.inspector)
 		
 	def OnSliderScroll(self, e):
 		obj = e.GetEventObject()
@@ -75,9 +71,9 @@ class Channel(wx.Panel):
 	def refresh(self):
 		context = self.log.before().split()[-2:]
 		suggestions = self.corpus.suggest(context, 20)
-		self.keyboard.Hide()
-		self.keyboard = Keyboard(self, self.doc.name, self.log)
-		self.sizer.Prepend(self.keyboard)
+		self.sourcetile.Hide()
+		self.sourcetile = SourceTile(self, self.doc.name, self.log)
+		self.sizer.Prepend(self.sourcetile)
 		self.Layout()
 
 
