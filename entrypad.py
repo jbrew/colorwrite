@@ -21,7 +21,7 @@ class EntryPad(wx.Panel):
 		self.font = wx.Font(16, wx.MODERN, wx.NORMAL, wx.NORMAL)
 		self.SetFont(self.font)
 		self.fontcolor = "White"
-		self.max = 3
+		self.max = 9
 		self.active = 1
 		self.options = []
 
