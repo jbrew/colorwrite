@@ -12,6 +12,7 @@ class Librarian(object):
 		transcripts = os.listdir(path)[1:10] # ignores DS_store, the first file in the directory
 		self.docs = [self.make_doc(filename) for filename in transcripts] 
 	
+
 	def make_doc(self, filename):
 		path = 'data/rawtranscripts/%s' % filename
 		with open(path, 'r') as f:

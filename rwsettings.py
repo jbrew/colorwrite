@@ -9,3 +9,6 @@ class RwSettings(object):
 		self.highlight_selection = True
 		self.mouse_highlighting = False
 		self.keyboard_wraparound = True
+
+		# Log settings
+		self.color_writing = False

@@ -14,7 +14,7 @@ class SourceBoard(wx.lib.scrolledpanel.ScrolledPanel):
 		self.log = log
 		self.writer = writer
 		self.channels = channels
-		self.colors = [(255,0,0),(0,255,0),(0,0,255),
+		self.colors = [(0,255,0),(255,0,0),(0,0,255),
 						(255,255,0),(0,255,255),(255,0,255)]
 
 		self.sbSizer = wx.GridSizer(0, 1, 5, 5)

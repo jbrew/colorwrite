@@ -1,16 +1,22 @@
 import wx
+import pyttsx
+import sys
+from speakermanager import SpeakerManager
 
 class Log(wx.TextCtrl):
 
     def __init__(self, parent, writer):
         wx.TextCtrl.__init__(self, parent, style=wx.TE_MULTILINE|wx.TE_RICH2, size = (700,300))
         self.writer = writer
-        self.font = wx.Font(16, wx.MODERN, wx.NORMAL, wx.NORMAL)
+        self.font = wx.Font(18, wx.MODERN, wx.NORMAL, wx.NORMAL)
         self.bgcolor = (20,20,20)
         self.fontcolor = "White"
         self.SetBackgroundColour(self.bgcolor)
         self.SetDefaultStyle(wx.TextAttr(self.fontcolor))
         self.SetFont(self.font)
+        self.engine = pyttsx.init()
+        self.sm = SpeakerManager().__enter__()
+        
 
     def after(self):
         text = self.GetValue()
@@ -45,20 +51,15 @@ class Log(wx.TextCtrl):
         self.SetDefaultStyle(wx.TextAttr(self.fontcolor))
         self.SetFont(self.font)
 
-        self.WriteText(" " + word)
-        """
-        if len(self.before()) > 0 and self.before()[-1] == ' ':
-            addition = word
-        else:
-            addition = " " + word
+        if self.writer.speech:
+            self.sm.say(word)
 
-        new_before = self.before() + addition
-        self.SetValue(new_before + self.after())
-        self.SetInsertionPoint(len(new_before))
-        current = self.GetInsertionPoint()
-        print current
-        """
-        
+        self.WriteText(" " + word)
+
+    def say(self, message):
+        sys.stdout.write("say: " + message)
+        self.engine.say(message)
+        self.engine.iterate()        
 
     # deletes one word
     def deleteWord(self):

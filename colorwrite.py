@@ -15,14 +15,16 @@ class Rainbowrite(wx.Panel):
  
 	#----------------------------------------------------------------------
 	def __init__(self, parent):
-		wx.Panel.__init__(self, parent, size = (1050,600))
+		wx.Panel.__init__(self, parent, size = (1100,600))
 
 		self.frame = parent
 		self.SetBackgroundColour((40,40,40))
 		self.SetForegroundColour((255,255,255))
 
 		self.color_writing = False
- 
+		self.speech = False
+		self.highlighting = True
+
 		self.mainSizer = wx.BoxSizer(wx.HORIZONTAL)
 		self.SetSizer(self.mainSizer)
 		
@@ -52,8 +54,7 @@ class Rainbowrite(wx.Panel):
 		self.mainSizer.AddSpacer((10,0))
 		self.mainSizer.Add(self.outputPanel)
 
-		self.addPathAsChannel('texts/terrible love.rtf')
-
+		self.addPathAsChannel('/Users/jamiebrew/Desktop/library/lyrics/drake.txt')
 		"""
 		if len(self.sourceboard.channels) == 0:
 			self.loadDialog()

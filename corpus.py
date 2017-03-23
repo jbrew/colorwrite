@@ -11,7 +11,6 @@ class Corpus(object):
 	"""
 	Takes a list of documents, each of which has a list of dictionaries of ngram counts by size called NGRAM_COUNTS
 	"""
-
 	def __init__(self, documents = []):		
 		self.tree = {}
 		self.wordcount = 0
@@ -30,7 +29,6 @@ class Corpus(object):
 
 	def add_sequence(self, sequence, count, tree):
 		tokens = sequence.split(' ')
-		#print '\nsequence', tokens
 		sequence_length = len(tokens)
 
 		if sequence_length == 1:
@@ -48,17 +46,6 @@ class Corpus(object):
 					self.increment_tree(context, count, tree, self.max_ngram_size)
 					branch = tree[context].after[reach-1]
 					self.increment_branch(word, count, branch)
-			
-			
-			
-			"""
-			if ngram_size > 1:
-				head = " ".join(tokens[:-2])
-				self.increment_tree(head, count, tree, self.max_ngram_size)
-
-				branch = tree[head].after[ngram_size-1]
-				self.increment_branch(tail, count, branch)
-			"""
 
 	def increment_tree(self, ngram, count, tree, max_ngram_size):
 		if ngram in tree:
@@ -117,32 +104,25 @@ class Corpus(object):
 			else:
 				sequence_list = [preceding[i:reach*-1+1] for i in range(len(preceding)-1)]
 
-			#print "sequence list", sequence_list
-			#print "reach", reach
-			#print self.tree
-
 			for sequence in sequence_list:
 				ngram_size = len(sequence)
 				ngram = " ".join(sequence)
-				weight = (1 * math.pow(ngram_size, 10)) / math.pow(reach, 10)
-				#print "\n", sequence
-				#print "size", ngram_size
-				#print "reach", reach
-				#print "weight:",weight
+				weight = (1 * math.pow(5, ngram_size)) / math.pow(10, reach)
 
 				if ngram in self.tree:
 					component = self.tree[ngram].after[reach-1]
-					new_component = self.weight_dictionary(component, weight)
+					new_component = self.assign_weight_to_dictionary(component, weight)
 					suggestions = self.merge_dictionaries([suggestions, new_component])
 
 		suggestion_list = list(reversed(sorted(suggestions.items(), key=operator.itemgetter(1))))
 		return suggestion_list[0:max_suggestions]
 
-
+	# given a list of ngram dictionaries, adds together the counts for shared entries
 	def merge_dictionaries(self, dict_list):
 		return sum((Counter(dict(x)) for x in dict_list), Counter())
 
-	def weight_dictionary(self, dict, weight):
+	# returns a new dictionary derived by multiplying each entry's score by a given weight
+	def assign_weight_to_dictionary(self, dict, weight):
 		new_dict = {}
 		for word, score in dict.items():
 			newscore = float(score) * weight

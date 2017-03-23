@@ -18,11 +18,11 @@ class EntryPad(wx.Panel):
 		self.epSizer = wx.GridSizer(self.rows,self.columns,5,5)
 		self.SetSizer(self.epSizer)
 		self.log = log
-		self.font = wx.Font(16, wx.MODERN, wx.NORMAL, wx.NORMAL)
+		self.font = wx.Font(20, wx.MODERN, wx.NORMAL, wx.NORMAL)
 		self.SetFont(self.font)
 		self.fontcolor = "White"
 		self.max = 9
-		self.active = 1
+		self.active = 0
 		self.options = []
 
 		self.settings = RwSettings()
@@ -51,10 +51,13 @@ class EntryPad(wx.Panel):
 			button_size = wx.Size(self.column_width,40)
 
 			if self.settings.highlight_selection:
-				if self.active+1 == i+1:
-					outercolor = (0,255,0)
+				if self.active+1 == i+1 and self.writer.highlighting:
+					if self.writer.color_writing:
+						outercolor = self.writer.sourceboard.average_color()
+					else:
+						outercolor = "Yellow"
 				else:
-					outercolor = (0,0,0)
+					outercolor = "Black"
 
 			elif self.settings.weight_highlighting:
 				outercolor=colors[i]
@@ -172,7 +175,7 @@ class EntryPad(wx.Panel):
 			self.surface_refresh()
 		elif keycode > 255:
 			event.DoAllowNextEvent()
-		elif keycode == wx.WXK_SPACE or keycode == wx.WXK_TAB:
+		elif keycode == wx.WXK_TAB:
 			self.enter_selected()
 			self.refresh()
 		elif keycode == wx.WXK_RETURN: # enter key
