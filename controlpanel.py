@@ -25,9 +25,11 @@ class ControlPanel(wx.Panel):
 		self.colorCheckbox.Bind(wx.EVT_CHECKBOX, self.onColorCheck)
 		self.controlSizer.Add(self.colorCheckbox, 0, wx.CENTER|wx.ALL, self.spacing)
 
+		"""
 		self.colorCheckbox = wx.CheckBox(self, label="Text to speech")
 		self.colorCheckbox.Bind(wx.EVT_CHECKBOX, self.onSpeechCheck)
 		self.controlSizer.Add(self.colorCheckbox, 0, wx.CENTER|wx.ALL, self.spacing)
+		"""
 
 		self.colorCheckbox = wx.CheckBox(self, label="Highlight select")
 		self.colorCheckbox.Bind(wx.EVT_CHECKBOX, self.onHighlightCheck)

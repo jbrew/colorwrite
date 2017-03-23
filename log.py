@@ -1,7 +1,7 @@
 import wx
 import pyttsx
 import sys
-from speakermanager import SpeakerManager
+#from speakermanager import SpeakerManager
 
 class Log(wx.TextCtrl):
 
@@ -15,7 +15,7 @@ class Log(wx.TextCtrl):
         self.SetDefaultStyle(wx.TextAttr(self.fontcolor))
         self.SetFont(self.font)
         self.engine = pyttsx.init()
-        self.sm = SpeakerManager().__enter__()
+       #self.sm = SpeakerManager().__enter__()
         
 
     def after(self):
@@ -52,7 +52,8 @@ class Log(wx.TextCtrl):
         self.SetFont(self.font)
 
         if self.writer.speech:
-            self.sm.say(word)
+            pass
+            #self.sm.say(word)
 
         self.WriteText(" " + word)
 
