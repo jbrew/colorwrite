@@ -107,7 +107,7 @@ class TopFrame(wx.Frame):
 	#----------------------------------------------------------------------
 	def __init__(self):
 		"""Constructor"""
-		wx.Frame.__init__(self, parent=None, title="Rainbowrite")
+		wx.Frame.__init__(self, parent=None, title="Colorwrite")
 		menubar = wx.MenuBar()
 		fileMenu = wx.Menu()
 		menubar.Append(fileMenu, '&File')
