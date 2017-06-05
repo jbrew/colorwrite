@@ -14,7 +14,7 @@ class SourceBoard(wx.lib.scrolledpanel.ScrolledPanel):
 		self.log = log
 		self.writer = writer
 		self.channels = channels
-		self.colors = [(0,255,0),(255,0,0),(0,0,255),
+		self.colors = [(0,255,0),(0,150,255),(255,0,0),
 						(255,255,0),(0,255,255),(255,0,255)]
 
 		self.sbSizer = wx.GridSizer(0, 1, 5, 5)
@@ -52,13 +52,19 @@ class SourceBoard(wx.lib.scrolledpanel.ScrolledPanel):
 
 
 	def average_color(self):
-		max_value = 100*255
-		color_list = [tuple([c.weight*x for x in c.color]) for c in self.channels]
+		color_list = [(c.color, c.weight) for c in self.channels]
 		r_total = 0
 		g_total = 0
 		b_total = 0
-		for r, g, b in color_list:
-			r_total += r
-			g_total += g
-			b_total += b
-		return (r_total/max_value*255, g_total/max_value*255, b_total/max_value*255)
+		for color, weight in color_list:
+			r, g, b = color
+			r_total += r * weight/100
+			g_total += g * weight/100
+			b_total += b * weight/100
+
+		highest_value = max(r_total, g_total, b_total)
+		r_total = r_total/highest_value * 255
+		g_total = g_total/highest_value * 255
+		b_total = b_total/highest_value * 255
+		
+		return (r_total, g_total, b_total)

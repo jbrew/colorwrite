@@ -11,7 +11,7 @@ class SpeakerManager(object):
             def __init__(self):
                 self._engine = pyttsx.init()
                 self._engine.startLoop(False)
-                self._engine.setProperty('voice', 'com.apple.speech.synthesis.voice.Alex')
+                self._engine.setProperty('voice', 'com.apple.speech.synthesis.voice.Moira')
                 rate = self._engine.getProperty('rate')
                 self._engine.setProperty('rate', rate)
 

@@ -15,14 +15,14 @@ class Rainbowrite(wx.Panel):
  
 	#----------------------------------------------------------------------
 	def __init__(self, parent):
-		wx.Panel.__init__(self, parent, size = (1100,600))
+		wx.Panel.__init__(self, parent, size = (1100,700))
 
 		self.frame = parent
 		self.SetBackgroundColour((40,40,40))
 		self.SetForegroundColour((255,255,255))
 
-		self.color_writing = False
-		self.speech = False
+		self.color_writing = True
+		self.speech = True
 		self.highlighting = True
 
 		self.mainSizer = wx.BoxSizer(wx.HORIZONTAL)
@@ -54,7 +54,12 @@ class Rainbowrite(wx.Panel):
 		self.mainSizer.AddSpacer((10,0))
 		self.mainSizer.Add(self.outputPanel)
 
-		self.addPathAsChannel('/Users/jamiebrew/Desktop/library/lyrics/drake.txt')
+		#self.addPathAsChannel('/Users/jamiebrew/Desktop/library/lyrics/drake.txt')
+		self.addPathAsChannel('/Users/jamiebrew/Desktop/library/lyrics/cake.txt')
+		#self.addPathAsChannel('/Users/jamiebrew/Desktop/library/lyrics/bowie')
+		#self.addPathAsChannel('/Users/jamiebrew/Desktop/library/beehive_manual.txt')
+		#self.addPathAsChannel('/Users/jamiebrew/Desktop/library/prose/bible/genesis')
+		#self.addPathAsChannel('/Users/jamiebrew/Desktop/library/speeches/feynman/1/_cleaner/all')
 		"""
 		if len(self.sourceboard.channels) == 0:
 			self.loadDialog()
@@ -107,7 +112,7 @@ class TopFrame(wx.Frame):
 	#----------------------------------------------------------------------
 	def __init__(self):
 		"""Constructor"""
-		wx.Frame.__init__(self, parent=None, title="Colorwrite")
+		wx.Frame.__init__(self, parent=None, title="Voicebox")
 		menubar = wx.MenuBar()
 		fileMenu = wx.Menu()
 		menubar.Append(fileMenu, '&File')

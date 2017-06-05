@@ -8,7 +8,10 @@ class Ngram(object):
 	def __init__(self, string, count=1, reach=0):
 		self.string = string
 		self.count = count
-		self.after = [{} for _ in range(reach+1)]
+		self.frequency = -1
+		self.count_branches = [{} for _ in range(reach+1)]
+		self.frequency_branches = [{} for _ in range(reach+1)]
+		self.sigscore_branches = [{} for _ in range(reach+1)]
 	
 	def __str__(self):
 		return "%s (%s)" % (self.string, str(self.count))

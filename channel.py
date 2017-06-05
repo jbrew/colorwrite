@@ -1,3 +1,4 @@
+from __future__ import division
 import wx
 from corpus import Corpus
 from sourcetile import SourceTile
@@ -23,12 +24,29 @@ class Channel(wx.Panel):
 
 		self.sourcetile = SourceTile(self, self.doc.name, self.log)
 		self.sizer.Add(self.sourcetile)
+
 		self.label = wx.StaticText(self, label='Weight')
 		self.label.SetForegroundColour(self.color)
 		self.sizer.Add(self.label)
 		self.wt_slider = wx.Slider(self, value=100, minValue=0, maxValue=100)
-		self.wt_slider.Bind(wx.EVT_SLIDER, self.OnSliderScroll)
+		self.wt_slider.Bind(wx.EVT_COMMAND_SCROLL_THUMBRELEASE, self.OnWtSliderScroll)
 		self.sizer.Add(self.wt_slider)
+
+		"""
+		self.f_label = wx.StaticText(self, label='Frequency')
+		self.f_label.SetForegroundColour(self.color)
+		self.sizer.Add(self.f_label)
+		self.f_slider = wx.Slider(self, value=100, minValue=0, maxValue=100)
+		self.f_slider.Bind(wx.EVT_COMMAND_SCROLL_THUMBRELEASE, self.OnFreqSliderScroll)
+		self.sizer.Add(self.f_slider)
+
+		self.sig_label = wx.StaticText(self, label='Sigscore')
+		self.sig_label.SetForegroundColour(self.color)
+		self.sizer.Add(self.sig_label)
+		self.sig_slider = wx.Slider(self, value=100, minValue=0, maxValue=100)
+		self.sig_slider.Bind(wx.EVT_COMMAND_SCROLL_THUMBRELEASE, self.OnSigSliderScroll)
+		self.sizer.Add(self.sig_slider)
+		"""
 
 		#self.sourcetile.header.Bind(wx.EVT_LEFT_UP, self.OnClick)
 
@@ -38,13 +56,23 @@ class Channel(wx.Panel):
 			self.inspector.SetBackgroundColour((150,150,150))
 			self.sizer.Add(self.inspector)
 		
-	def OnSliderScroll(self, e):
+	def OnWtSliderScroll(self, e):
 		obj = e.GetEventObject()
 		val = obj.GetValue()
 		self.weight = val
-		#new_color = self.writer.sourceboard.average_color()
-		#self.writer.SetBackgroundColour(new_color)
-		#self.writer.frame.Layout()
+		self.writer.refresh()
+
+	def OnFreqSliderScroll(self, e):
+		obj = e.GetEventObject()
+		val = obj.GetValue()
+		self.corpus.wt_to_frequency = val
+		self.writer.refresh()
+
+	def OnSigSliderScroll(self, e):
+		obj = e.GetEventObject()
+		val = obj.GetValue()
+		self.corpus.wt_to_sigscore = val/1000
+		self.writer.refresh()
 
 	def OnDelete(self, e):
 		self.sourceboard.removeChannel(self)

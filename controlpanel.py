@@ -23,17 +23,17 @@ class ControlPanel(wx.Panel):
 		
 		self.colorCheckbox = wx.CheckBox(self, label="Color writing")
 		self.colorCheckbox.Bind(wx.EVT_CHECKBOX, self.onColorCheck)
+		self.colorCheckbox.SetValue(self.writer.color_writing)
 		self.controlSizer.Add(self.colorCheckbox, 0, wx.CENTER|wx.ALL, self.spacing)
-
-		"""
+		
 		self.colorCheckbox = wx.CheckBox(self, label="Text to speech")
 		self.colorCheckbox.Bind(wx.EVT_CHECKBOX, self.onSpeechCheck)
+		self.colorCheckbox.SetValue(self.writer.speech)
 		self.controlSizer.Add(self.colorCheckbox, 0, wx.CENTER|wx.ALL, self.spacing)
-		"""
 
 		self.colorCheckbox = wx.CheckBox(self, label="Highlight select")
 		self.colorCheckbox.Bind(wx.EVT_CHECKBOX, self.onHighlightCheck)
-		self.colorCheckbox.SetValue(True)
+		self.colorCheckbox.SetValue(self.writer.highlighting)
 		self.controlSizer.Add(self.colorCheckbox, 0, wx.CENTER|wx.ALL, self.spacing)
 		
 	# responds when color writing checkbox is clicked

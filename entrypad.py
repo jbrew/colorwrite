@@ -18,10 +18,14 @@ class EntryPad(wx.Panel):
 		self.epSizer = wx.GridSizer(self.rows,self.columns,5,5)
 		self.SetSizer(self.epSizer)
 		self.log = log
-		self.font = wx.Font(20, wx.MODERN, wx.NORMAL, wx.NORMAL)
+		self.performance = False
+		if self.performance:
+			self.font = wx.Font(25, wx.MODERN, wx.NORMAL, wx.NORMAL)
+		else:  
+			self.font = wx.Font(20, wx.MODERN, wx.NORMAL, wx.NORMAL)
 		self.SetFont(self.font)
 		self.fontcolor = "White"
-		self.max = 9
+		self.max = 15
 		self.active = 0
 		self.options = []
 
