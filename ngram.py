@@ -11,7 +11,7 @@ class Ngram(object):
 		self.frequency = -1
 		self.count_branches = [{} for _ in range(reach+1)]
 		self.frequency_branches = [{} for _ in range(reach+1)]
-		self.sigscore_branches = [{} for _ in range(reach+1)]
+		self.specificity_score_branches = [{} for _ in range(reach+1)]
 	
 	def __str__(self):
 		return "%s (%s)" % (self.string, str(self.count))

@@ -1,5 +1,6 @@
 import wx
 from document import Document
+from corpus import Corpus
 from channel import Channel
 from log import Log
 from sourceboard import SourceBoard
@@ -37,33 +38,48 @@ class Rainbowrite(wx.Panel):
 		self.outputPanel.SetSizer(self.outputSizer)
 		
 		self.log = Log(self.outputPanel, self)           # text control for text output
-		self.outputSizer.AddSpacer((0,50))
+		#self.outputSizer.AddSpacer((0,50))
 		self.outputSizer.Add(self.log)
 
 		self.controlPanel = ControlPanel(self.inputPanel, self, size=wx.Size(205,-1))
 		self.sourceboard = SourceBoard(self.inputPanel, self, self.log, channels=[])
 		
 		self.ep = EntryPad(self.outputPanel,self.sourceboard,self.log,self)
-		self.outputSizer.AddSpacer((0,10))
+		#self.outputSizer.AddSpacer((0,10))
 		self.outputSizer.Add(self.ep)
 
 		self.inputSizer.Add(self.controlPanel)
 		self.inputSizer.Add(self.sourceboard)
 		
 		self.mainSizer.Add(self.inputPanel)
-		self.mainSizer.AddSpacer((10,0))
+		#self.mainSizer.AddSpacer((10,0))
 		self.mainSizer.Add(self.outputPanel)
+		#self.load_TED()
 
-		#self.addPathAsChannel('/Users/jamiebrew/Desktop/library/lyrics/drake.txt')
-		self.addPathAsChannel('/Users/jamiebrew/Desktop/library/lyrics/cake.txt')
-		#self.addPathAsChannel('/Users/jamiebrew/Desktop/library/lyrics/bowie')
-		#self.addPathAsChannel('/Users/jamiebrew/Desktop/library/beehive_manual.txt')
-		#self.addPathAsChannel('/Users/jamiebrew/Desktop/library/prose/bible/genesis')
-		#self.addPathAsChannel('/Users/jamiebrew/Desktop/library/speeches/feynman/1/_cleaner/all')
+		#self.load_assembly_module()
+		#self.addPathAsChannel('/Users/jbrew/Desktop/library/lyrics/drake.txt')
+		self.addChannel(['/Users/jbrew/Desktop/library/lyrics/bowie'])
+		#self.addPathAsChannel('/Users/jbrew/Desktop/library/beehive_manual.txt')
+		#self.addPathAsChannel('/Users/jbrew/Desktop/library/prose/bible/genesis')
+		#self.addPathAsChannel('/Users/jbrew/Desktop/library/speeches/feynman/1/_cleaner/all')
 		"""
 		if len(self.sourceboard.channels) == 0:
 			self.loadDialog()
 		"""
+
+	def load_TED(self):
+		self.sourceboard.clear_all_channels()
+		self.addChannel(['/Users/jbrew/Desktop/library/TED/data/counts/1gram_counts', 
+			'/Users/jbrew/Desktop/library/TED/data/counts/2gram_counts', 
+			'/Users/jbrew/Desktop/library/TED/data/counts/3gram_counts', 
+			'/Users/jbrew/Desktop/library/TED/data/counts/4gram_counts'])
+		self.addChannel(['/Users/jbrew/Desktop/library/TED/data/rawtranscripts/ai'])
+
+	def load_lyrics_module(self):
+		self.sourceboard.clear_all_channels()
+		self.addChannel(['/Users/jbrew/Desktop/library/lyrics/bowie'])
+		self.addChannel(['/Users/jbrew/Desktop/library/lyrics/bjork.txt'])
+		self.addChannel(['/Users/jbrew/Desktop/library/lyrics/bieber.txt'])
 
 
 	#----------------------------------------------------------------------
@@ -76,13 +92,16 @@ class Rainbowrite(wx.Panel):
 
 
 	#----------------------------------------------------------------------
-	def addPathAsChannel(self, path):
-		with open(path) as f:
-			text = f.read()
-
-		name = path.split('/')[-1]
-		d = Document(name, text)
-		self.sourceboard.addChannel(d)
+	def addChannel(self, paths):
+		c = Corpus()
+		for path in paths:
+			print path
+			with open(path) as f:
+				text = f.read()
+				name = path.split('/')[-1]
+				d = Document(name, text)
+				c.add_document(d)
+		self.sourceboard.addChannel(c)
 		self.refresh()
 		self.frame.fSizer.Layout()
 		self.frame.Fit()
@@ -98,8 +117,7 @@ class Rainbowrite(wx.Panel):
 		loadChannelDialog.ShowModal()
 
 		paths = loadChannelDialog.GetPaths()
-		for path in paths:
-			self.addPathAsChannel(path)
+		self.addChannel(paths)
 		
 
 		loadChannelDialog.Destroy()

@@ -7,22 +7,22 @@ import random
 
 class Channel(wx.Panel):
 
-	def __init__(self, parent, writer, doc, log, color=(0,0,0)):
+	def __init__(self, parent, writer, corpus, log, color=(0,0,0)):
 		wx.Panel.__init__(self, parent, style=wx.SUNKEN_BORDER)
 		self.sourceboard = parent
 		self.writer = writer
 		self.color = color
 		self.sizer = wx.BoxSizer(wx.VERTICAL)
 		self.SetSizer(self.sizer)
-		self.doc = doc
-		self.corpus = Corpus([doc])
+		self.corpus = corpus
+		self.name = corpus.documents[0].name
 		self.log = log
 		self.active = False
 		self.weight = 100
 		self.suggestions = self.suggest(20)
 		self.inspector = False
 
-		self.sourcetile = SourceTile(self, self.doc.name, self.log)
+		self.sourcetile = SourceTile(self, self.name, self.log)
 		self.sizer.Add(self.sourcetile)
 
 		self.label = wx.StaticText(self, label='Weight')
@@ -52,7 +52,7 @@ class Channel(wx.Panel):
 
 		if self.inspector:
 			self.sizer.Add(wx.StaticLine(self, -1, wx.Point(10, 30), wx.Size(200, 30)))
-			self.inspector = Inspector(self, doc)
+			self.inspector = Inspector(self, self.corpus.documents[0])
 			self.inspector.SetBackgroundColour((150,150,150))
 			self.sizer.Add(self.inspector)
 		
@@ -100,7 +100,7 @@ class Channel(wx.Panel):
 		context = self.log.before().split()[-2:]
 		suggestions = self.corpus.suggest(context, 20)
 		self.sourcetile.Hide()
-		self.sourcetile = SourceTile(self, self.doc.name, self.log)
+		self.sourcetile = SourceTile(self, self.name, self.log)
 		self.sizer.Prepend(self.sourcetile)
 		self.Layout()
 

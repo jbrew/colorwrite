@@ -12,7 +12,7 @@ class EntryPad(wx.Panel):
 		wx.Panel.__init__(self, parent, size=wx.Size(self.width,-1))
 		self.writer = writer
 		self.sourceboard = sourceboard
-		self.columns = 3
+		self.columns = 4
 		self.rows = 0
 		self.column_width = self.width/self.columns-7
 		self.epSizer = wx.GridSizer(self.rows,self.columns,5,5)
@@ -22,10 +22,10 @@ class EntryPad(wx.Panel):
 		if self.performance:
 			self.font = wx.Font(25, wx.MODERN, wx.NORMAL, wx.NORMAL)
 		else:  
-			self.font = wx.Font(20, wx.MODERN, wx.NORMAL, wx.NORMAL)
+			self.font = wx.Font(14, wx.MODERN, wx.NORMAL, wx.NORMAL)
 		self.SetFont(self.font)
 		self.fontcolor = "White"
-		self.max = 15
+		self.max = 28
 		self.active = 0
 		self.options = []
 
@@ -52,6 +52,8 @@ class EntryPad(wx.Panel):
 		for i in range(len(self.options)):
 
 			word = str(self.options[i])
+			wrapped = self.wrap_text(word, 18)
+			#print wrapped
 			button_size = wx.Size(self.column_width,40)
 
 			if self.settings.highlight_selection:
@@ -71,7 +73,7 @@ class EntryPad(wx.Panel):
 			
 			innercolor=self.log.bgcolor
 
-			button = WordButton(self, size=button_size, num=i, word=word, outercolor=outercolor, innercolor=innercolor, settings=self.settings,fontcolor="White")
+			button = WordButton(self, size=button_size, num=i, word=wrapped, outercolor=outercolor, innercolor=innercolor, settings=self.settings,fontcolor="White")
 
 			self.writer.Unbind(wx.EVT_CHAR_HOOK)
 			self.writer.Bind(wx.EVT_CHAR_HOOK, lambda event: self.onKey(event))
@@ -79,12 +81,18 @@ class EntryPad(wx.Panel):
 			button.inset_button.Bind(wx.EVT_LEFT_UP, lambda event, w = word: self.onClick(event,w))
 		self.Layout()
 
-	"""
-	# returns the number of the active button
-	def active(self):
-		return (self.active_row-1) * self.columns + self.active_column
-	"""
-	
+
+	def wrap_text(self, string, max_length):
+		tokens = string.split(' ')
+		if len(tokens) > 1:
+			splits = [(tokens[:i], tokens[i:])    for i in range(len(tokens) + 1)]
+			for i in range(2,len(splits)):
+				if len(" ".join(splits[i][0])) > max_length:
+					return " ".join(splits[i-1][0]) + '\n' + self.wrap_text(" ".join(splits[i-1][1]), 18)
+		return string
+
+		
+
 	# sets the given number to be active
 	def set_active(self, n):
 		self.active = n

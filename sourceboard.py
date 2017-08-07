@@ -22,8 +22,8 @@ class SourceBoard(wx.lib.scrolledpanel.ScrolledPanel):
 		for c in self.channels:
 			self.addChannel(c)
 
-	def addChannel(self, document):
-		c = Channel(self, self.writer, document, self.log, self.colors[len(self.channels)])
+	def addChannel(self, corpus):
+		c = Channel(self, self.writer, corpus, self.log, self.colors[len(self.channels)])
 		self.channels.append(c)
 		self.sbSizer.Add(c)
 		self.sbSizer.Layout()
@@ -33,6 +33,15 @@ class SourceBoard(wx.lib.scrolledpanel.ScrolledPanel):
 	def removeChannel(self, c):
 		if c in self.channels:
 			self.channels.remove(c)
+			#self.sbSizer.Remove(c)
+			c.Destroy()
+		self.sbSizer.Layout()
+		self.Layout()
+
+	# removes all channels from this object
+	def clear_all_channels(self):
+		for c in self.channels:
+			self.channels.remove(c)
 			self.sbSizer.Remove(c)
 			c.Destroy()
 		self.sbSizer.Layout()
@@ -41,7 +50,7 @@ class SourceBoard(wx.lib.scrolledpanel.ScrolledPanel):
 	def refresh(self):
 		for c in self.channels:
 			c.refresh()
-
+			
 	# activates only the given channel
 	def set_solo(self, solo_channel):
 		for c in self.channels:
