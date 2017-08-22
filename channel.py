@@ -82,8 +82,8 @@ class Channel(wx.Panel):
 		self.writer.sourceboard.set_solo(self)
 
 	def suggest(self, number):
-		preceding = self.log.GetValue()[0:self.log.GetInsertionPoint()].split()[-2:]
-		following = self.log.GetValue()[self.log.GetInsertionPoint():].split()[:2]
+		preceding = self.log.GetValue()[0:self.log.GetInsertionPoint()].split()[-3:]
+		following = self.log.GetValue()[self.log.GetInsertionPoint():].split()[:3]
 		return self.corpus.suggest(preceding, number)
 
 	def weighted_choice(self, choices):

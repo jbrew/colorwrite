@@ -57,8 +57,8 @@ class Rainbowrite(wx.Panel):
 		#self.load_TED()
 
 		#self.load_assembly_module()
-		#self.addPathAsChannel('/Users/jbrew/Desktop/library/lyrics/drake.txt')
-		self.addChannel(['/Users/jbrew/Desktop/library/lyrics/bowie'])
+		self.addChannel(['/Users/jbrew/Desktop/library/spaceneedle_low'])
+		#self.addChannel(['/Users/jbrew/Desktop/library/lyrics/bowie'])
 		#self.addPathAsChannel('/Users/jbrew/Desktop/library/beehive_manual.txt')
 		#self.addPathAsChannel('/Users/jbrew/Desktop/library/prose/bible/genesis')
 		#self.addPathAsChannel('/Users/jbrew/Desktop/library/speeches/feynman/1/_cleaner/all')

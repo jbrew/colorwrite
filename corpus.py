@@ -21,7 +21,7 @@ class Corpus(object):
 		for doc in documents:
 			self.add_document(doc)
 		self.wt_to_frequency = 1
-		self.wt_to_specificity_score = .1
+		self.wt_to_specificity_score = .00000001
 		self.baseline = self.baseline_dict()
 
 	def baseline_dict(self):
